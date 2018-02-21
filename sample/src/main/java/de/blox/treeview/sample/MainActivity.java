@@ -26,7 +26,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         final TreeView treeView = findViewById(R.id.tree);
-//        final TextView selectedText = findViewById(R.id.selected_text);
         FloatingActionButton addButton = findViewById(R.id.addNode);
 
         final BaseTreeAdapter adapter = new BaseTreeAdapter<ViewHolder>(this, R.layout.node) {
@@ -54,6 +53,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        // example tree
         mCurrentNode = new TreeNode(getNodeText());
         mCurrentNode.addChild(new TreeNode(getNodeText()));
         final TreeNode child3 = new TreeNode(getNodeText());
@@ -73,7 +73,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 mCurrentNode = adapter.getNode(position);
-//                selectedText.setText(String.valueOf(position + 1));
                 System.out.println(adapter.getCount());
                 Snackbar.make(treeView, "Clicked on " + mCurrentNode.getData().toString(), LENGTH_SHORT).show();
             }

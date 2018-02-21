@@ -14,7 +14,7 @@ Download
 
 ```groovy
 dependencies {
-    implementation 'de.blox:treeview:0.0.3-alpha'
+    implementation 'de.blox.treeview:treeview:0.0.3'
 }
 ```
 
@@ -25,13 +25,11 @@ Usage
 <LinearLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-
     <de.blox.treeview.TreeView
      android:id="@+id/treeview"
      android:layout_width="match_parent"
      android:layout_height="match_parent">
     </de.blox.treeview.TreeView>
-    
 </LinearLayout>
 ```
 You can make the node Layout how you like. Just define a layout file, e.g. ```node.xml``` ...
@@ -43,7 +41,8 @@ You can make the node Layout how you like. Just define a layout file, e.g. ```no
                                     android:layout_height="wrap_content"
                                     android:layout_gravity="center"
                                     android:layout_margin="5dp"
-                                    card_view:cardCornerRadius="5dp"
+                                    card_view:cardBackgroundColor="@android:color/holo_blue_dark"
+                                    card_view:cardElevation="16dp"
                                     card_view:contentPadding="10dp">
 
     <LinearLayout
@@ -55,6 +54,7 @@ You can make the node Layout how you like. Just define a layout file, e.g. ```no
             android:id="@+id/textView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:textColor="@android:color/white"
             android:textStyle="bold"/>
 
     </LinearLayout>
@@ -65,9 +65,7 @@ You can make the node Layout how you like. Just define a layout file, e.g. ```no
 
 ```java
 public class MainActivity extends AppCompatActivity {
-
-    private TreeNode mCurrentNode;
-    private BaseTreeAdapter mAdapter;
+    private int nodeCount = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,10 +82,31 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onBindViewHolder(ViewHolder viewHolder, Object data, int position) {
-                viewHolder.mTextView.setText(String.valueOf(position + 1));
+                viewHolder.mTextView.setText(data.toString());
             }
         };
-        treeView.setAdapter(mAdapter);
+        treeView.setAdapter(adapter);
+        
+        // example tree
+        TreeNode rootNode = new TreeNode(getNodeText());
+        rootNode.addChild(new TreeNode(getNodeText()));
+        final TreeNode child3 = new TreeNode(getNodeText());
+        child3.addChild(new TreeNode(getNodeText()));
+        final TreeNode child6 = new TreeNode(getNodeText());
+        child6.addChild(new TreeNode(getNodeText()));
+        child6.addChild(new TreeNode(getNodeText()));
+        child3.addChild(child6);
+        rootNode.addChild(child3);
+        final TreeNode child4 = new TreeNode(getNodeText());
+        child4.addChild(new TreeNode(getNodeText()));
+        child4.addChild(new TreeNode(getNodeText()));
+        rootNode.addChild(child4);
+
+        adapter.setRootNode(rootNode);
+    }
+    
+    private String getNodeText() {
+        return "Node " + nodeCount++;
     }
 }
 ```
@@ -108,11 +127,11 @@ Customization
 To use the custom attributes you have to add the namespace first: ```
     xmlns:app="http://schemas.android.com/apk/res-auto"```
 
-| Attribute              | Format    | Example                              |
-|------------------------|-----------|--------------------------------------|
-| ```level_separation``` | Dimension | ```50dp```                           |
-| ```line_thickness```   | Dimension | ```10dp```                           |
-| ```line_color```       | Color     | ```"@android:color/holo_red_dark"``` |
+| Attribute        | Format    | Example                        |
+|------------------|-----------|--------------------------------|
+| level_separation | Dimension | 50dp                           |
+| line_thickness   | Dimension | 10dp                           |
+| line_color       | Color     | "@android:color/holo_red_dark" |
 
 License
 =======
