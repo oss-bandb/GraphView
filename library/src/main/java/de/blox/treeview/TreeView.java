@@ -107,7 +107,7 @@ public class TreeView extends AdapterView<TreeAdapter> implements GestureDetecto
             TreeNode node = mAdapter.getNode(index);
 
             // calculate the size and position of this child
-            final int left = screenPosition.x;
+            final int left = screenPosition.x + getScreenXCenter();
             final int top = screenPosition.y + (node.getLevel() * mLevelSeparation);
             final int right = left + width;
             final int bottom = top + height;
@@ -186,12 +186,14 @@ public class TreeView extends AdapterView<TreeAdapter> implements GestureDetecto
     }
 
     private void drawLines(Canvas canvas, TreeNode treeNode) {
+        int screenXCenter = getScreenXCenter();
+
         if (treeNode.hasChildren()) {
             mLinePath.reset();
 
-            mLinePath.moveTo(treeNode.getX() + (mMaxChildWidth / 2),
+            mLinePath.moveTo(treeNode.getX() + (mMaxChildWidth / 2) + screenXCenter,
                     treeNode.getY() + mMaxChildHeight + (mLevelSeparation * treeNode.getLevel()));
-            mLinePath.lineTo(treeNode.getX() + (mMaxChildWidth / 2),
+            mLinePath.lineTo(treeNode.getX() + (mMaxChildWidth / 2) + screenXCenter,
                     treeNode.getY() + mMaxChildHeight + (mLevelSeparation * treeNode.getLevel()) + (mLevelSeparation / 2));
             canvas.drawPath(mLinePath, mLinePaint);
 
@@ -204,9 +206,9 @@ public class TreeView extends AdapterView<TreeAdapter> implements GestureDetecto
             mLinePath.reset();
 
             TreeNode parent = treeNode.getParent();
-            mLinePath.moveTo(treeNode.getX() + (mMaxChildWidth / 2), treeNode.getY() + (mLevelSeparation * treeNode.getLevel()));
-            mLinePath.lineTo(treeNode.getX() + (mMaxChildWidth / 2), treeNode.getY() + (mLevelSeparation * treeNode.getLevel()) - (mLevelSeparation / 2));
-            mLinePath.lineTo(parent.getX() + (mMaxChildWidth / 2),
+            mLinePath.moveTo(treeNode.getX() + (mMaxChildWidth / 2) + screenXCenter, treeNode.getY() + (mLevelSeparation * treeNode.getLevel()));
+            mLinePath.lineTo(treeNode.getX() + (mMaxChildWidth / 2) + screenXCenter, treeNode.getY() + (mLevelSeparation * treeNode.getLevel()) - (mLevelSeparation / 2));
+            mLinePath.lineTo(parent.getX() + (mMaxChildWidth / 2) + screenXCenter,
                     parent.getY() + mMaxChildHeight + (mLevelSeparation * parent.getLevel()) + mLevelSeparation / 2);
             canvas.drawPath(mLinePath, mLinePaint);
         }
@@ -356,6 +358,10 @@ public class TreeView extends AdapterView<TreeAdapter> implements GestureDetecto
 
     @Override
     public void setSelection(int position) {
+    }
+
+    private int getScreenXCenter() {
+        return (int) getPivotX() - getChildAt(0).getMeasuredWidth() / 2;
     }
 
     @Override

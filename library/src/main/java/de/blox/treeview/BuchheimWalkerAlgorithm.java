@@ -283,6 +283,6 @@ class BuchheimWalkerAlgorithm implements Algorithm {
 
         mSize = size;
         firstWalk(root, 0, 0);
-        secondWalk(root, 0);
+        secondWalk(root, -getPrelim(root));
     }
 }
