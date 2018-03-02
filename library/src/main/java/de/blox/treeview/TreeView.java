@@ -37,8 +37,7 @@ public class TreeView extends AdapterView<TreeAdapter> implements GestureDetecto
     private int mMaxChildWidth;
     private int mMaxChildHeight;
     private Rect mRect;
-    private float mMaxTreeWidth;
-    private float mMaxTreeHeight;
+    private Rect mBoundaries = new Rect();
 
     private DataSetObserver mDataSetObserver;
     private TreeNodeSize mTreeNodeSize = new TreeNodeSize();
@@ -95,6 +94,11 @@ public class TreeView extends AdapterView<TreeAdapter> implements GestureDetecto
     }
 
     private void positionItems() {
+        int maxLeft = Integer.MAX_VALUE;
+        int maxRight = Integer.MIN_VALUE;
+        int maxTop = Integer.MAX_VALUE;
+        int maxBottom = Integer.MIN_VALUE;
+
         for (int index = 0; index < mAdapter.getCount(); index++) {
             final View child = mAdapter.getView(index, null, this);
 
@@ -114,10 +118,13 @@ public class TreeView extends AdapterView<TreeAdapter> implements GestureDetecto
 
             child.layout(left, top, right, bottom);
 
-            // save the max width and height of the whole tree, so we have the exact boundaries
-            mMaxTreeWidth = Math.max(mMaxTreeWidth, right);
-            mMaxTreeHeight = Math.max(mMaxTreeHeight, bottom);
+            maxRight = Math.max(maxRight, right);
+            maxLeft = Math.min(maxLeft, left);
+            maxBottom = Math.max(maxBottom, bottom);
+            maxTop = Math.min(maxTop, top);
         }
+
+        mBoundaries.set(maxLeft - (getWidth() - Math.abs(maxLeft)) - Math.abs(maxLeft), -getHeight(), maxRight, maxBottom);
     }
 
     /**
@@ -294,15 +301,7 @@ public class TreeView extends AdapterView<TreeAdapter> implements GestureDetecto
         final float newScrollX = getScrollX() + distanceX;
         final float newScrollY = getScrollY() + distanceY;
 
-        final float maxLeftScroll = -getWidth() + mMaxChildWidth + getPaddingLeft();
-        final float maxRightScroll = mMaxTreeWidth - mMaxChildWidth - getPaddingRight();
-        final float maxTopScroll = -getHeight() + mMaxChildHeight + getPaddingTop();
-        final float maxBottomScroll = mMaxTreeHeight - mMaxChildHeight - getPaddingBottom();
-
-        if (newScrollX >= maxLeftScroll &&
-                newScrollX <= maxRightScroll &&
-                newScrollY >= maxTopScroll &&
-                newScrollY <= maxBottomScroll) {
+        if (mBoundaries.contains((int) newScrollX, (int) newScrollY)) {
             scrollBy((int) distanceX, (int) distanceY);
         }
         return true;
