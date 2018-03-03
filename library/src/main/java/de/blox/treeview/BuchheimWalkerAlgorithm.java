@@ -121,7 +121,7 @@ class BuchheimWalkerAlgorithm implements Algorithm {
                 vom = nextLeft(vom);
                 vop = nextRight(vop);
 
-                setAncestor(node, vop);
+                setAncestor(vop, node);
 
                 double shift = (getPrelim(vim) + sim) - (getPrelim(vip) + sip) + getSpacing(vim, vip);
                 if (shift > 0) {
