@@ -127,11 +127,12 @@ Customization
 To use the custom attributes you have to add the namespace first: ```
     xmlns:app="http://schemas.android.com/apk/res-auto"```
 
-| Attribute        | Format    | Example                        |
-|------------------|-----------|--------------------------------|
-| level_separation | Dimension | 50dp                           |
-| line_thickness   | Dimension | 10dp                           |
-| line_color       | Color     | "@android:color/holo_red_dark" |
+| Attribute        | Format    | Example                        | Explanation|
+|------------------|-----------|--------------------------------|------------|
+| levelSeparation | Dimension | 50dp                           | How much space should be used between levels
+| lineThickness   | Dimension | 10dp                           | Set how thick the connection lines should be
+| lineColor       | Color     | "@android:color/holo_red_dark" | Set the color of the connection lines
+| useMaxSize      | Boolean   | true                           | Use the same size for each node
 
 License
 =======
