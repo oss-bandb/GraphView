@@ -11,7 +11,6 @@ class BuchheimWalkerAlgorithm implements Algorithm {
 
     private BuchheimWalkerConfiguration mConfiguration;
     private Map<TreeNode, BuchheimWalkerNodeData> mNodeData = new HashMap<>();
-    private TreeNodeSize mSize;
 
     BuchheimWalkerAlgorithm(BuchheimWalkerConfiguration configuration) {
         mConfiguration = configuration;
@@ -43,7 +42,7 @@ class BuchheimWalkerAlgorithm implements Algorithm {
             // here, because it's already initialized with 0
             if (hasLeftSibling(node)) {
                 TreeNode leftSibling = getLeftSibling(node);
-                nodeData.setPrelim(getPrelim(leftSibling) + getSpacing());
+                nodeData.setPrelim(getPrelim(leftSibling) + getSpacing(leftSibling, node));
             }
         } else {
             TreeNode leftMost = getLeftMostChild(node);
@@ -61,11 +60,11 @@ class BuchheimWalkerAlgorithm implements Algorithm {
 
             executeShifts(node);
 
-            double midPoint = 0.5 * (getPrelim(leftMost) + getPrelim(rightMost));
+            double midPoint = 0.5 * ((getPrelim(leftMost) + getPrelim(rightMost) + rightMost.getWidth()) - node.getWidth());
 
             if (hasLeftSibling(node)) {
                 TreeNode leftSibling = getLeftSibling(node);
-                nodeData.setPrelim(getPrelim(leftSibling) + getSpacing());
+                nodeData.setPrelim(getPrelim(leftSibling) + getSpacing(leftSibling, node));
                 nodeData.setModifier(nodeData.getPrelim() - midPoint);
             } else {
                 nodeData.setPrelim(midPoint);
@@ -76,7 +75,7 @@ class BuchheimWalkerAlgorithm implements Algorithm {
     private void secondWalk(TreeNode node, double modifier) {
         BuchheimWalkerNodeData nodeData = getNodeData(node);
         node.setX((int) (nodeData.getPrelim() + modifier));
-        node.setY(nodeData.getDepth() * mSize.getHeight());
+        node.setY(nodeData.getDepth());
         node.setLevel(nodeData.getDepth());
 
         for (TreeNode w : node.getChildren()) {
@@ -124,7 +123,7 @@ class BuchheimWalkerAlgorithm implements Algorithm {
 
                 setAncestor(node, vop);
 
-                double shift = (getPrelim(vim) + sim) - (getPrelim(vip) + sip) + getSpacing();
+                double shift = (getPrelim(vim) + sim) - (getPrelim(vip) + sip) + getSpacing(vim, vip);
                 if (shift > 0) {
                     moveSubtree(ancestor(vim, node, defaultAncestor), node, shift);
                     sip += shift;
@@ -213,8 +212,8 @@ class BuchheimWalkerAlgorithm implements Algorithm {
         return getNodeData(node).getThread();
     }
 
-    private int getSpacing() {
-        return mConfiguration.getSiblingSeparation() + mSize.getWidth();
+    private int getSpacing(TreeNode leftNode, TreeNode rightNode) {
+        return mConfiguration.getSiblingSeparation() + leftNode.getWidth();
     }
 
     private boolean isLeaf(TreeNode node) {
@@ -278,10 +277,9 @@ class BuchheimWalkerAlgorithm implements Algorithm {
     }
 
     @Override
-    public void run(TreeNode root, TreeNodeSize size) {
+    public void run(TreeNode root) {
         mNodeData.clear();
 
-        mSize = size;
         firstWalk(root, 0, 0);
         secondWalk(root, -getPrelim(root));
     }

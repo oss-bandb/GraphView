@@ -33,14 +33,16 @@ public class TreeView extends AdapterView<TreeAdapter> implements GestureDetecto
     private int mLineColor;
     private int mLevelSeparation;
 
+    private boolean mUseMaxSize;
+
     private TreeAdapter mAdapter;
     private int mMaxChildWidth;
     private int mMaxChildHeight;
+    private int mMinChildHeight;
     private Rect mRect;
     private Rect mBoundaries = new Rect();
 
     private DataSetObserver mDataSetObserver;
-    private TreeNodeSize mTreeNodeSize = new TreeNodeSize();
 
     private GestureDetector mGestureDetector;
 
@@ -69,6 +71,7 @@ public class TreeView extends AdapterView<TreeAdapter> implements GestureDetecto
             mLevelSeparation = a.getDimensionPixelSize(R.styleable.TreeView_level_separation, DEFAULT_LINE_LENGTH);
             mLineThickness = a.getDimensionPixelSize(R.styleable.TreeView_line_thickness, DEFAULT_LINE_THICKNESS);
             mLineColor = a.getColor(R.styleable.TreeView_line_color, DEFAULT_LINE_COLOR);
+            mUseMaxSize = a.getBoolean(R.styleable.TreeView_useMaxSize, false);
         } finally {
             a.recycle();
         }
@@ -99,6 +102,9 @@ public class TreeView extends AdapterView<TreeAdapter> implements GestureDetecto
         int maxTop = Integer.MAX_VALUE;
         int maxBottom = Integer.MIN_VALUE;
 
+        int globalPadding = 0;
+        int localPadding = 0;
+        int currentLevel = 0;
         for (int index = 0; index < mAdapter.getCount(); index++) {
             final View child = mAdapter.getView(index, null, this);
 
@@ -110,13 +116,25 @@ public class TreeView extends AdapterView<TreeAdapter> implements GestureDetecto
             final Point screenPosition = mAdapter.getScreenPosition(index);
             TreeNode node = mAdapter.getNode(index);
 
+            if (height > mMinChildHeight) {
+                localPadding = Math.max(localPadding, height - mMinChildHeight);
+            }
+
+            if (currentLevel != node.getLevel()) {
+                globalPadding += localPadding;
+                localPadding = 0;
+                currentLevel = node.getLevel();
+            }
+
             // calculate the size and position of this child
             final int left = screenPosition.x + getScreenXCenter();
-            final int top = screenPosition.y + (node.getLevel() * mLevelSeparation);
+            final int top = screenPosition.y * mMinChildHeight + (node.getLevel() * mLevelSeparation) + globalPadding;
             final int right = left + width;
             final int bottom = top + height;
 
             child.layout(left, top, right, bottom);
+            node.setX(left);
+            node.setY(top);
 
             maxRight = Math.max(maxRight, right);
             maxLeft = Math.min(maxLeft, left);
@@ -168,10 +186,17 @@ public class TreeView extends AdapterView<TreeAdapter> implements GestureDetecto
 
         addViewInLayout(child, -1, params, false);
 
-        final int widthSpec = MeasureSpec.makeMeasureSpec(
-                mMaxChildWidth, MeasureSpec.EXACTLY);
-        final int heightSpec = MeasureSpec.makeMeasureSpec(
-                mMaxChildHeight, MeasureSpec.EXACTLY);
+        int widthSpec = MeasureSpec.makeMeasureSpec(
+                MeasureSpec.UNSPECIFIED, MeasureSpec.UNSPECIFIED);
+        int heightSpec = MeasureSpec.makeMeasureSpec(
+                MeasureSpec.UNSPECIFIED, MeasureSpec.UNSPECIFIED);
+
+        if (mUseMaxSize) {
+            widthSpec = MeasureSpec.makeMeasureSpec(
+                    mMaxChildWidth, MeasureSpec.EXACTLY);
+            heightSpec = MeasureSpec.makeMeasureSpec(
+                    mMaxChildHeight, MeasureSpec.EXACTLY);
+        }
 
         child.measure(widthSpec, heightSpec);
     }
@@ -193,17 +218,7 @@ public class TreeView extends AdapterView<TreeAdapter> implements GestureDetecto
     }
 
     private void drawLines(Canvas canvas, TreeNode treeNode) {
-        int screenXCenter = getScreenXCenter();
-
         if (treeNode.hasChildren()) {
-            mLinePath.reset();
-
-            mLinePath.moveTo(treeNode.getX() + (mMaxChildWidth / 2) + screenXCenter,
-                    treeNode.getY() + mMaxChildHeight + (mLevelSeparation * treeNode.getLevel()));
-            mLinePath.lineTo(treeNode.getX() + (mMaxChildWidth / 2) + screenXCenter,
-                    treeNode.getY() + mMaxChildHeight + (mLevelSeparation * treeNode.getLevel()) + (mLevelSeparation / 2));
-            canvas.drawPath(mLinePath, mLinePaint);
-
             for (TreeNode child : treeNode.getChildren()) {
                 drawLines(canvas, child);
             }
@@ -213,10 +228,19 @@ public class TreeView extends AdapterView<TreeAdapter> implements GestureDetecto
             mLinePath.reset();
 
             TreeNode parent = treeNode.getParent();
-            mLinePath.moveTo(treeNode.getX() + (mMaxChildWidth / 2) + screenXCenter, treeNode.getY() + (mLevelSeparation * treeNode.getLevel()));
-            mLinePath.lineTo(treeNode.getX() + (mMaxChildWidth / 2) + screenXCenter, treeNode.getY() + (mLevelSeparation * treeNode.getLevel()) - (mLevelSeparation / 2));
-            mLinePath.lineTo(parent.getX() + (mMaxChildWidth / 2) + screenXCenter,
-                    parent.getY() + mMaxChildHeight + (mLevelSeparation * parent.getLevel()) + mLevelSeparation / 2);
+            mLinePath.moveTo(treeNode.getX() + (treeNode.getWidth() / 2), treeNode.getY());
+            mLinePath.lineTo(treeNode.getX() + (treeNode.getWidth() / 2), treeNode.getY() - (mLevelSeparation / 2));
+            mLinePath.lineTo(parent.getX() + (parent.getWidth() / 2),
+                    treeNode.getY() - mLevelSeparation / 2);
+
+            canvas.drawPath(mLinePath, mLinePaint);
+            mLinePath.reset();
+
+            mLinePath.moveTo(parent.getX() + (parent.getWidth() / 2),
+                    treeNode.getY() - mLevelSeparation / 2);
+            mLinePath.lineTo(parent.getX() + (parent.getWidth() / 2),
+                    parent.getY() + parent.getHeight());
+
             canvas.drawPath(mLinePath, mLinePaint);
         }
     }
@@ -277,6 +301,25 @@ public class TreeView extends AdapterView<TreeAdapter> implements GestureDetecto
      */
     public void setLevelSeparation(@Px int levelSeparation) {
         mLevelSeparation = levelSeparation;
+        invalidate();
+        requestLayout();
+    }
+
+    /**
+     * @return <code>true</code> if using same size for each node, <code>false</code> otherwise.
+     */
+    public boolean isUsingMaxSize() {
+        return mUseMaxSize;
+    }
+
+    /**
+     * Whether to use the max available size for each node, so all nodes have the same size. A
+     * change to this value invokes a re-drawing of the tree.
+     *
+     * @param useMaxSize <code>true</code> if using same size for each node, <code>false</code> otherwise.
+     */
+    public void setUseMaxSize(boolean useMaxSize) {
+        mUseMaxSize = useMaxSize;
         invalidate();
         requestLayout();
     }
@@ -391,33 +434,55 @@ public class TreeView extends AdapterView<TreeAdapter> implements GestureDetecto
             return;
         }
 
-        final int specWidth = MeasureSpec.getSize(widthMeasureSpec);
-        final int specHeight = MeasureSpec.getSize(heightMeasureSpec);
         int maxWidth = 0;
         int maxHeight = 0;
+        int minHeight = Integer.MAX_VALUE;
 
         for (int i = 0; i < mAdapter.getCount(); i++) {
             View child = mAdapter.getView(i, null, this);
-            final int childSpecWidth = MeasureSpec.makeMeasureSpec(
-                    specWidth, MeasureSpec.UNSPECIFIED);
-            final int childSpecHeight = MeasureSpec.makeMeasureSpec(
-                    specHeight, MeasureSpec.UNSPECIFIED);
 
             LayoutParams params = child.getLayoutParams();
             if (params == null) {
                 params = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
             }
             addViewInLayout(child, -1, params, true);
+            child.measure(MeasureSpec.UNSPECIFIED, MeasureSpec.UNSPECIFIED);
 
-            child.measure(childSpecWidth, childSpecHeight);
-            maxWidth = Math.max(maxWidth, child.getMeasuredWidth());
-            maxHeight = Math.max(maxHeight, child.getMeasuredHeight());
+            TreeNode node = mAdapter.getNode(i);
+            final int measuredWidth = child.getMeasuredWidth();
+            final int measuredHeight = child.getMeasuredHeight();
+            node.setSize(measuredWidth, measuredHeight);
+
+            maxWidth = Math.max(maxWidth, measuredWidth);
+            maxHeight = Math.max(maxHeight, measuredHeight);
+            minHeight = Math.min(minHeight, measuredHeight);
         }
 
         mMaxChildWidth = maxWidth;
         mMaxChildHeight = maxHeight;
-        mTreeNodeSize.set(maxWidth, maxHeight);
-        mAdapter.notifySizeChanged(mTreeNodeSize);
+        mMinChildHeight = minHeight;
+
+        if (mUseMaxSize) {
+            removeAllViewsInLayout();
+            for (int i = 0; i < mAdapter.getCount(); i++) {
+                View child = mAdapter.getView(i, null, this);
+
+                LayoutParams params = child.getLayoutParams();
+                if (params == null) {
+                    params = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+                }
+                addViewInLayout(child, -1, params, true);
+
+                final int widthSpec = MeasureSpec.makeMeasureSpec(mMaxChildWidth, MeasureSpec.EXACTLY);
+                final int heightSpec = MeasureSpec.makeMeasureSpec(mMaxChildHeight, MeasureSpec.EXACTLY);
+                child.measure(widthSpec, heightSpec);
+
+                TreeNode node = mAdapter.getNode(i);
+                node.setSize(child.getMeasuredWidth(), child.getMeasuredHeight());
+            }
+        }
+
+        mAdapter.notifySizeChanged();
     }
 
     private class TreeDataSetObserver extends DataSetObserver {

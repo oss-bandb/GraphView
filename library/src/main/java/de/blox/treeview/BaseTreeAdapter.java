@@ -10,6 +10,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  *
  */
@@ -29,17 +32,10 @@ public abstract class BaseTreeAdapter<VH> implements TreeAdapter<VH> {
         mLayoutRes = layoutRes;
     }
 
-    private TreeNode getNodeAtPosition(int position) {
-        if (mRootNode == null || position < 0) {
-            throw new IndexOutOfBoundsException();
-        }
-        return mRootNode.getNodeAtPosition(position);
-    }
-
     @Override
-    public void notifySizeChanged(@NonNull TreeNodeSize size) {
+    public void notifySizeChanged() {
         if (mRootNode != null) {
-            getAlgorithm().run(mRootNode, size);
+            getAlgorithm().run(mRootNode);
         }
     }
 
@@ -74,12 +70,29 @@ public abstract class BaseTreeAdapter<VH> implements TreeAdapter<VH> {
 
     @Override
     public TreeNode getNode(int position) {
-        return mRootNode != null ? mRootNode.getNodeAtPosition(position) : null;
+        List<TreeNode> list = new ArrayList<>();
+        list.add(mRootNode);
+
+        return mRootNode != null ? breadthSearch(list, position) : null;
+    }
+
+    protected TreeNode breadthSearch(List<TreeNode> nodes, int position) {
+        if (nodes.size() > position) {
+            return nodes.get(position);
+        }
+
+        List<TreeNode> childNodes = new ArrayList<>();
+        for (TreeNode n : nodes) {
+            for (TreeNode child : n.getChildren())
+                childNodes.add(child);
+        }
+
+        return breadthSearch(childNodes, position - nodes.size());
     }
 
     @Override
     public Point getScreenPosition(int position) {
-        TreeNode node = getNodeAtPosition(position);
+        TreeNode node = getNode(position);
 
         return new Point(node.getX(), node.getY());
     }
@@ -116,7 +129,7 @@ public abstract class BaseTreeAdapter<VH> implements TreeAdapter<VH> {
 
     @Override
     public Object getItem(int position) {
-        return getNodeAtPosition(position).getData();
+        return getNode(position).getData();
     }
 
     @Override
@@ -143,7 +156,7 @@ public abstract class BaseTreeAdapter<VH> implements TreeAdapter<VH> {
             viewHolder = (VH) view.getTag();
         }
 
-        TreeNode node = getNodeAtPosition(position);
+        TreeNode node = getNode(position);
         onBindViewHolder(viewHolder, node.getData(), position);
 
         return view;

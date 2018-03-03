@@ -1,7 +1,5 @@
 package de.blox.treeview;
 
-import android.support.annotation.Nullable;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -13,6 +11,8 @@ public class TreeNode {
     private Object mData;
     private int mX;
     private int mY;
+    private int mWidth;
+    private int mHeight;
     private int mLevel;
     private int mNodeCount = 1;
     private TreeNode mParent;
@@ -51,6 +51,19 @@ public class TreeNode {
         mY = y;
     }
 
+    int getWidth() {
+        return mWidth;
+    }
+
+    int getHeight() {
+        return mHeight;
+    }
+
+    void setSize(int width, int height) {
+        mWidth = width;
+        mHeight = height;
+    }
+
     public Object getData() {
         return mData;
     }
@@ -83,27 +96,6 @@ public class TreeNode {
         }
 
         return mNodeCount = size;
-    }
-
-    @Nullable
-    TreeNode getNodeAtPosition(int position) {
-        if (position == 0) {
-            return this;
-        } else {
-            int childPosition = position - 1;
-            int count;
-            for (TreeNode child : getChildren()) {
-                count = child.getNodeCount();
-                if (childPosition < count) {
-                    return child.getNodeAtPosition(childPosition);
-                } else {
-                    childPosition -= count;
-                }
-            }
-        }
-
-        // TODO no node at this position. throw exception?
-        return null;
     }
 
     public void addChild(TreeNode child) {
@@ -190,5 +182,9 @@ public class TreeNode {
                 ", mY=" + mY +
                 ", mChildren=" + mChildren +
                 '}';
+    }
+
+    public boolean isFirstChild(TreeNode node) {
+        return mChildren.indexOf(node) == 0;
     }
 }

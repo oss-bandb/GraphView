@@ -4,5 +4,6 @@
         <attr name="level_separation" format="dimension"/>
         <attr name="line_thickness" format="dimension"/>
         <attr name="line_color" format="color"/>
+        <attr name="useMaxSize" format="boolean"/>
     </declare-styleable>
 </resources>

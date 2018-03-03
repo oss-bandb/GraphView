@@ -10,7 +10,7 @@ import android.widget.Adapter;
  */
 interface TreeAdapter<VH> extends Adapter, TreeNodeObserver {
 
-    void notifySizeChanged(@NonNull TreeNodeSize size);
+    void notifySizeChanged();
 
     /**
      * Returns the currently set algorithm. It uses the {@link BuchheimWalkerAlgorithm} as default,

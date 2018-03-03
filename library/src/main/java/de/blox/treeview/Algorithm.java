@@ -4,5 +4,5 @@ package de.blox.treeview;
  */
 
 interface Algorithm {
-    void run(TreeNode root, TreeNodeSize size);
+    void run(TreeNode root);
 }
