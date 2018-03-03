@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <declare-styleable name="TreeView">
-        <attr name="level_separation" format="dimension"/>
-        <attr name="line_thickness" format="dimension"/>
-        <attr name="line_color" format="color"/>
+        <attr name="levelSeparation" format="dimension"/>
+        <attr name="lineThickness" format="dimension"/>
+        <attr name="lineColor" format="color"/>
         <attr name="useMaxSize" format="boolean"/>
     </declare-styleable>
 </resources>

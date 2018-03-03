@@ -25,6 +25,7 @@ public class TreeView extends AdapterView<TreeAdapter> implements GestureDetecto
     private static final int DEFAULT_LINE_LENGTH = 100;
     private static final int DEFAULT_LINE_THICKNESS = 5;
     private static final int DEFAULT_LINE_COLOR = Color.BLACK;
+    public static final boolean DEFAULT_USE_MAX_SIZE = false;
     private static final int INVALID_INDEX = -1;
 
     Path mLinePath = new Path();
@@ -68,10 +69,10 @@ public class TreeView extends AdapterView<TreeAdapter> implements GestureDetecto
     private void initAttrs(Context context, AttributeSet attrs) {
         TypedArray a = context.getTheme().obtainStyledAttributes(attrs, R.styleable.TreeView, 0, 0);
         try {
-            mLevelSeparation = a.getDimensionPixelSize(R.styleable.TreeView_level_separation, DEFAULT_LINE_LENGTH);
-            mLineThickness = a.getDimensionPixelSize(R.styleable.TreeView_line_thickness, DEFAULT_LINE_THICKNESS);
-            mLineColor = a.getColor(R.styleable.TreeView_line_color, DEFAULT_LINE_COLOR);
-            mUseMaxSize = a.getBoolean(R.styleable.TreeView_useMaxSize, false);
+            mLevelSeparation = a.getDimensionPixelSize(R.styleable.TreeView_levelSeparation, DEFAULT_LINE_LENGTH);
+            mLineThickness = a.getDimensionPixelSize(R.styleable.TreeView_lineThickness, DEFAULT_LINE_THICKNESS);
+            mLineColor = a.getColor(R.styleable.TreeView_lineColor, DEFAULT_LINE_COLOR);
+            mUseMaxSize = a.getBoolean(R.styleable.TreeView_useMaxSize, DEFAULT_USE_MAX_SIZE);
         } finally {
             a.recycle();
         }

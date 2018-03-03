@@ -13,13 +13,13 @@
         android:id="@+id/tree"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:line_color="@android:color/holo_blue_dark"/>
+        app:lineColor="@android:color/holo_blue_dark"/>
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/addNode"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:srcCompat="@drawable/ic_add_white_24dp"
+        android:src="@drawable/ic_add_white_24dp"
         android:layout_gravity="bottom|end"
         android:layout_margin="@dimen/fab_margin"
         />
