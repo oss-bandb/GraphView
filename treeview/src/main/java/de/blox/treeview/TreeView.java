@@ -22,10 +22,10 @@ import android.widget.AdapterView;
 
 public class TreeView extends AdapterView<TreeAdapter> implements GestureDetector.OnGestureListener {
 
+    public static final boolean DEFAULT_USE_MAX_SIZE = false;
     private static final int DEFAULT_LINE_LENGTH = 100;
     private static final int DEFAULT_LINE_THICKNESS = 5;
     private static final int DEFAULT_LINE_COLOR = Color.BLACK;
-    public static final boolean DEFAULT_USE_MAX_SIZE = false;
     private static final int INVALID_INDEX = -1;
 
     Path mLinePath = new Path();
@@ -107,9 +107,7 @@ public class TreeView extends AdapterView<TreeAdapter> implements GestureDetecto
         int localPadding = 0;
         int currentLevel = 0;
         for (int index = 0; index < mAdapter.getCount(); index++) {
-            final View child = mAdapter.getView(index, null, this);
-
-            addAndMeasureChild(child);
+            final View child = getChildAt(index);
 
             final int width = child.getMeasuredWidth();
             final int height = child.getMeasuredHeight();
@@ -177,29 +175,6 @@ public class TreeView extends AdapterView<TreeAdapter> implements GestureDetecto
         final View itemView = getChildAt(index);
         final long id = mAdapter.getItemId(index);
         performItemClick(itemView, index, id);
-    }
-
-    private void addAndMeasureChild(final View child) {
-        LayoutParams params = child.getLayoutParams();
-        if (params == null) {
-            params = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
-        }
-
-        addViewInLayout(child, -1, params, false);
-
-        int widthSpec = MeasureSpec.makeMeasureSpec(
-                MeasureSpec.UNSPECIFIED, MeasureSpec.UNSPECIFIED);
-        int heightSpec = MeasureSpec.makeMeasureSpec(
-                MeasureSpec.UNSPECIFIED, MeasureSpec.UNSPECIFIED);
-
-        if (mUseMaxSize) {
-            widthSpec = MeasureSpec.makeMeasureSpec(
-                    mMaxChildWidth, MeasureSpec.EXACTLY);
-            heightSpec = MeasureSpec.makeMeasureSpec(
-                    mMaxChildHeight, MeasureSpec.EXACTLY);
-        }
-
-        child.measure(widthSpec, heightSpec);
     }
 
     private void longClickChildAt(final int x, final int y) {
@@ -388,7 +363,6 @@ public class TreeView extends AdapterView<TreeAdapter> implements GestureDetecto
             return;
         }
 
-        removeAllViewsInLayout();
         positionItems();
 
         invalidate();
@@ -447,8 +421,23 @@ public class TreeView extends AdapterView<TreeAdapter> implements GestureDetecto
                 params = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
             }
             addViewInLayout(child, -1, params, true);
-            child.measure(MeasureSpec.UNSPECIFIED, MeasureSpec.UNSPECIFIED);
 
+            int childWidthSpec;
+            int childHeightSpec;
+
+            if (params.width > 0) {
+                childWidthSpec = MeasureSpec.makeMeasureSpec(params.width, MeasureSpec.EXACTLY);
+            } else {
+                childWidthSpec = MeasureSpec.UNSPECIFIED;
+            }
+
+            if (params.height > 0) {
+                childHeightSpec = MeasureSpec.makeMeasureSpec(params.height, MeasureSpec.EXACTLY);
+            } else {
+                childHeightSpec = MeasureSpec.UNSPECIFIED;
+            }
+
+            child.measure(childWidthSpec, childHeightSpec);
             TreeNode node = mAdapter.getNode(i);
             final int measuredWidth = child.getMeasuredWidth();
             final int measuredHeight = child.getMeasuredHeight();
