@@ -8,7 +8,7 @@ import android.widget.Adapter;
 /**
  *
  */
-interface TreeAdapter<VH> extends Adapter, TreeNodeObserver {
+public interface TreeAdapter<VH> extends Adapter, TreeNodeObserver {
 
     void notifySizeChanged();
 
