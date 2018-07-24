@@ -66,6 +66,25 @@ public class TreeView extends AdapterView<TreeAdapter> implements GestureDetecto
         init(context, attrs);
     }
 
+    /**
+     * Create a {@link MeasureSpec} depending on the value of {@code dimension}.
+     * If the value is negative ({@link LayoutParams#MATCH_PARENT} or
+     * {@link LayoutParams#WRAP_CONTENT}) this returns {@link MeasureSpec#UNSPECIFIED}. If positive
+     * it returns a MeasureSpec based on the value with the {@link MeasureSpec#EXACTLY} mode.
+     *
+     * @param dimension value of the dimension
+     * @return {@link MeasureSpec#UNSPECIFIED} or a MeasureSpec based on {@code dimension}
+     */
+    private static int makeMeasureSpec(int dimension) {
+        int spec;
+        if (dimension > 0) {
+            spec = MeasureSpec.makeMeasureSpec(dimension, MeasureSpec.EXACTLY);
+        } else {
+            spec = MeasureSpec.UNSPECIFIED;
+        }
+        return spec;
+    }
+
     private void initAttrs(Context context, AttributeSet attrs) {
         TypedArray a = context.getTheme().obtainStyledAttributes(attrs, R.styleable.TreeView, 0, 0);
         try {
@@ -107,7 +126,8 @@ public class TreeView extends AdapterView<TreeAdapter> implements GestureDetecto
         int localPadding = 0;
         int currentLevel = 0;
         for (int index = 0; index < mAdapter.getCount(); index++) {
-            final View child = getChildAt(index);
+            final View child = mAdapter.getView(index, null, this);
+            addAndMeasureChild(child);
 
             final int width = child.getMeasuredWidth();
             final int height = child.getMeasuredHeight();
@@ -142,6 +162,26 @@ public class TreeView extends AdapterView<TreeAdapter> implements GestureDetecto
         }
 
         mBoundaries.set(maxLeft - (getWidth() - Math.abs(maxLeft)) - Math.abs(maxLeft), -getHeight(), maxRight, maxBottom);
+    }
+
+    private void addAndMeasureChild(final View child) {
+        LayoutParams params = child.getLayoutParams();
+        if (params == null) {
+            params = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+        }
+
+        addViewInLayout(child, -1, params, false);
+        int widthSpec = makeMeasureSpec(params.width);
+        int heightSpec = makeMeasureSpec(params.height);
+
+        if (mUseMaxSize) {
+            widthSpec = MeasureSpec.makeMeasureSpec(
+                    mMaxChildWidth, MeasureSpec.EXACTLY);
+            heightSpec = MeasureSpec.makeMeasureSpec(
+                    mMaxChildHeight, MeasureSpec.EXACTLY);
+        }
+
+        child.measure(widthSpec, heightSpec);
     }
 
     /**
@@ -363,6 +403,7 @@ public class TreeView extends AdapterView<TreeAdapter> implements GestureDetecto
             return;
         }
 
+        removeAllViewsInLayout();
         positionItems();
 
         invalidate();
@@ -422,20 +463,8 @@ public class TreeView extends AdapterView<TreeAdapter> implements GestureDetecto
             }
             addViewInLayout(child, -1, params, true);
 
-            int childWidthSpec;
-            int childHeightSpec;
-
-            if (params.width > 0) {
-                childWidthSpec = MeasureSpec.makeMeasureSpec(params.width, MeasureSpec.EXACTLY);
-            } else {
-                childWidthSpec = MeasureSpec.UNSPECIFIED;
-            }
-
-            if (params.height > 0) {
-                childHeightSpec = MeasureSpec.makeMeasureSpec(params.height, MeasureSpec.EXACTLY);
-            } else {
-                childHeightSpec = MeasureSpec.UNSPECIFIED;
-            }
+            int childWidthSpec = makeMeasureSpec(params.width);
+            int childHeightSpec = makeMeasureSpec(params.height);
 
             child.measure(childWidthSpec, childHeightSpec);
             TreeNode node = mAdapter.getNode(i);

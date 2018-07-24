@@ -40,7 +40,7 @@ ext {
     siteUrl = "https://github.com/Team-Blox/TreeView"
     gitUrl = "https://github.com/Team-Blox/TreeView.git"
 
-    libraryVersion = '0.1.2'
+    libraryVersion = '0.1.3'
 
     developerId = 'Team-Blox'
     developerName = 'Blox'

@@ -14,7 +14,7 @@ Download
 
 ```groovy
 dependencies {
-    implementation 'de.blox.treeview:treeview:0.1.2'
+    implementation 'de.blox.treeview:treeview:0.1.3'
 }
 ```
 
