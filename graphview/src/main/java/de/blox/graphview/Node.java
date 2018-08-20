@@ -21,11 +21,11 @@ public class Node {
         this.pos = pos;
     }
 
-    public double getX() {
+    public float getX() {
         return pos.getX();
     }
 
-    public double getY() {
+    public float getY() {
         return pos.getY();
     }
 

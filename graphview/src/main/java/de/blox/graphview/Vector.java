@@ -1,14 +1,14 @@
 package de.blox.graphview;
 
 public class Vector {
-    private final double x;
-    private final double y;
+    private final float x;
+    private final float y;
 
     public Vector() {
         this(0, 0);
     }
 
-    public Vector(double x, double y) {
+    public Vector(float x, float y) {
         this.x = x;
         this.y = y;
     }
@@ -25,7 +25,7 @@ public class Vector {
         return new Vector(x * operand.x, y * operand.y);
     }
 
-    public Vector multiply(double operand) {
+    public Vector multiply(float operand) {
         return new Vector(x * operand, y * operand);
     }
 
@@ -33,19 +33,19 @@ public class Vector {
         return new Vector(x / operand.x, y / operand.y);
     }
 
-    public Vector divide(double operand) {
+    public Vector divide(float operand) {
         return new Vector(x / operand, y / operand);
     }
 
-    public double length() {
-        return Math.sqrt(x * x + y * y);
+    public float length() {
+        return (float) Math.sqrt(x * x + y * y);
     }
 
-    public double getX() {
+    public float getX() {
         return x;
     }
 
-    public double getY() {
+    public float getY() {
         return y;
     }
 

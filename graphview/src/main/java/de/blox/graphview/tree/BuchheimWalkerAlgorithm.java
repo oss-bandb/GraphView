@@ -16,24 +16,32 @@ import de.blox.graphview.Graph;
 import de.blox.graphview.Node;
 import de.blox.graphview.Vector;
 
+import static de.blox.graphview.tree.BuchheimWalkerConfiguration.ORIENTATION_BOTTOM_TOP;
+import static de.blox.graphview.tree.BuchheimWalkerConfiguration.ORIENTATION_LEFT_RIGHT;
+import static de.blox.graphview.tree.BuchheimWalkerConfiguration.ORIENTATION_RIGHT_LEFT;
+import static de.blox.graphview.tree.BuchheimWalkerConfiguration.ORIENTATION_TOP_BOTTOM;
+
 public class BuchheimWalkerAlgorithm implements Algorithm {
 
     private BuchheimWalkerConfiguration configuration;
     private Map<Node, BuchheimWalkerNodeData> mNodeData = new HashMap<>();
     private EdgeRenderer edgeRenderer;
     private int minNodeHeight = Integer.MAX_VALUE;
+    private int minNodeWidth = Integer.MAX_VALUE;
     private int width;
+    private int height;
+    private Vector anchor;
 
     public BuchheimWalkerAlgorithm(BuchheimWalkerConfiguration configuration) {
         this.configuration = configuration;
-        edgeRenderer = new TreeEdgeRenderer(configuration.getLevelSeparation());
+        edgeRenderer = new TreeEdgeRenderer(configuration);
     }
 
     /**
      * Creates a new BuchheimWalkerAlgorithm with default configuration.
      */
     public BuchheimWalkerAlgorithm() {
-        this(new BuchheimWalkerConfiguration());
+        this(new BuchheimWalkerConfiguration.Builder().build());
     }
 
     private static int compare(int x, int y) {
@@ -52,11 +60,34 @@ public class BuchheimWalkerAlgorithm implements Algorithm {
         return mNodeData.get(node);
     }
 
+    private Vector getAnchor() {
+        if (anchor != null) {
+            return anchor;
+        }
+
+        switch (configuration.getOrientation()) {
+            case ORIENTATION_TOP_BOTTOM:
+                anchor = new Vector(width / 2, 0);
+                break;
+            case ORIENTATION_BOTTOM_TOP:
+                anchor = new Vector(width / 2, height);
+                break;
+            case ORIENTATION_LEFT_RIGHT:
+                anchor = new Vector(0, height / 2);
+                break;
+            case ORIENTATION_RIGHT_LEFT:
+                anchor = new Vector(width, height / 2);
+        }
+
+        return anchor;
+    }
+
     private void firstWalk(Graph graph, Node node, int depth, int number) {
         BuchheimWalkerNodeData nodeData = createNodeData(node);
         nodeData.setDepth(depth);
         nodeData.setNumber(number);
         minNodeHeight = Math.min(minNodeHeight, node.getHeight());
+        minNodeWidth = Math.min(minNodeWidth, node.getWidth());
 
         if (isLeaf(graph, node)) {
             // if the node has no left sibling, prelim(node) should be set to 0, but we don't have to set it
@@ -95,14 +126,13 @@ public class BuchheimWalkerAlgorithm implements Algorithm {
 
     private void secondWalk(Graph graph, Node node, double modifier) {
         BuchheimWalkerNodeData nodeData = getNodeData(node);
-        final int depth = nodeData.getDepth();
-        final int firstNodeWidth = graph.getNode(0).getWidth();
-        node.setPos(new Vector((nodeData.getPrelim() + modifier) + width / 2 - firstNodeWidth / 2, depth));
+        node.setPos(new Vector((float) (nodeData.getPrelim() + modifier), nodeData.getDepth()));
 
-        for (Node w : graph.findSuccessors(node)) {
+        for (Node w : graph.successorsOf(node)) {
             secondWalk(graph, w, modifier + nodeData.getModifier());
         }
     }
+
 
     private void executeShifts(Graph graph, Node node) {
         double shift = 0, change = 0;
@@ -126,7 +156,7 @@ public class BuchheimWalkerAlgorithm implements Algorithm {
             Node vip = node;
             Node vop = node;
             Node vim = leftSibling;
-            Node vom = getLeftMostChild(graph, graph.findPredecessors(vip).get(0));
+            Node vom = getLeftMostChild(graph, graph.predecessorsOf(vip).get(0));
 
             double sip = getModifier(vip);
             double sop = getModifier(vop);
@@ -210,7 +240,7 @@ public class BuchheimWalkerAlgorithm implements Algorithm {
     private Node ancestor(Graph graph, Node vim, Node node, Node defaultAncestor) {
         BuchheimWalkerNodeData vipNodeData = getNodeData(vim);
 
-        if (graph.findPredecessors(vipNodeData.getAncestor()).get(0) == graph.findPredecessors(node).get(0)) {
+        if (graph.predecessorsOf(vipNodeData.getAncestor()).get(0) == graph.predecessorsOf(node).get(0)) {
             return vipNodeData.getAncestor();
         }
 
@@ -240,17 +270,21 @@ public class BuchheimWalkerAlgorithm implements Algorithm {
             separation = configuration.getSiblingSeparation();
         }
 
-        return separation + leftNode.getWidth();
+        final int orientation = configuration.getOrientation();
+        boolean vertical = orientation == ORIENTATION_TOP_BOTTOM || orientation == ORIENTATION_BOTTOM_TOP;
+
+        return separation + (int) (0.5 *
+                (vertical ? leftNode.getWidth() + rightNode.getWidth()
+                        : leftNode.getHeight() + rightNode.getHeight()));
     }
 
     private boolean isSibling(Graph graph, Node leftNode, Node rightNode) {
-        Node leftParent = graph.findPredecessors(leftNode).get(0);
-        return graph.findSuccessors(leftParent).contains(rightNode);
-
+        Node leftParent = graph.predecessorsOf(leftNode).get(0);
+        return graph.successorsOf(leftParent).contains(rightNode);
     }
 
     private boolean isLeaf(Graph graph, Node node) {
-        return graph.findSuccessors(node).isEmpty();
+        return graph.successorsOf(node).isEmpty();
     }
 
     private Node getLeftSibling(Graph graph, Node node) {
@@ -258,20 +292,20 @@ public class BuchheimWalkerAlgorithm implements Algorithm {
             return null;
         }
 
-        Node parent = graph.findPredecessors(node).get(0);
-        List<Node> children = graph.findSuccessors(parent);
+        Node parent = graph.predecessorsOf(node).get(0);
+        List<Node> children = graph.successorsOf(parent);
         int nodeIndex = children.indexOf(node);
         return children.get(nodeIndex - 1);
     }
 
     private boolean hasLeftSibling(Graph graph, Node node) {
-        List<Node> parents = graph.findPredecessors(node);
+        List<Node> parents = graph.predecessorsOf(node);
         if (parents.isEmpty()) {
             return false;
         }
 
         Node parent = parents.get(0);
-        int nodeIndex = graph.findSuccessors(parent).indexOf(node);
+        int nodeIndex = graph.successorsOf(parent).indexOf(node);
         return nodeIndex > 0;
     }
 
@@ -280,29 +314,29 @@ public class BuchheimWalkerAlgorithm implements Algorithm {
             return null;
         }
 
-        Node parent = graph.findPredecessors(node).get(0);
-        List<Node> children = graph.findSuccessors(parent);
+        Node parent = graph.predecessorsOf(node).get(0);
+        List<Node> children = graph.successorsOf(parent);
         int nodeIndex = children.indexOf(node);
         return children.get(nodeIndex + 1);
     }
 
     private boolean hasRightSibling(Graph graph, Node node) {
-        List<Node> parents = graph.findPredecessors(node);
+        List<Node> parents = graph.predecessorsOf(node);
         if (parents.isEmpty()) {
             return false;
         }
         Node parent = parents.get(0);
-        List<Node> children = graph.findSuccessors(parent);
+        List<Node> children = graph.successorsOf(parent);
         int nodeIndex = children.indexOf(node);
         return nodeIndex < children.size() - 1;
     }
 
     private Node getLeftMostChild(Graph graph, Node node) {
-        return graph.findSuccessors(node).get(0);
+        return graph.successorsOf(node).get(0);
     }
 
     private Node getRightMostChild(Graph graph, Node node) {
-        List<Node> children = graph.findSuccessors(node);
+        List<Node> children = graph.successorsOf(node);
         if (children.isEmpty()) {
             return null;
         }
@@ -318,7 +352,6 @@ public class BuchheimWalkerAlgorithm implements Algorithm {
         final Node firstNode = graph.getNode(0);
         firstWalk(graph, firstNode, 0, 0);
 
-
         secondWalk(graph, firstNode, -getPrelim(firstNode));
 
         positionNodes(graph);
@@ -328,6 +361,7 @@ public class BuchheimWalkerAlgorithm implements Algorithm {
         int globalPadding = 0;
         int localPadding = 0;
         int currentLevel = 0;
+
 
         for (Node node : sortByLevel(graph)) {
             final int height = node.getHeight();
@@ -342,8 +376,35 @@ public class BuchheimWalkerAlgorithm implements Algorithm {
                 currentLevel = depth;
             }
 
-            node.setPos(new Vector(node.getX(), node.getY() * minNodeHeight + (depth * configuration.getLevelSeparation()) + globalPadding));
+            node.setPos(getPosition(node, globalPadding, graph));
         }
+    }
+
+    private Vector getPosition(Node node, int globalPadding, Graph graph) {
+        final int depth = getNodeData(node).getDepth();
+        final Node root = graph.getNode(0);
+        Vector position = null;
+        switch (configuration.getOrientation()) {
+            case ORIENTATION_TOP_BOTTOM:
+                position = new Vector(node.getX() + anchor.getX() - root.getWidth() / 2, anchor.getY() +
+                        node.getY() * minNodeHeight + (depth * configuration.getLevelSeparation()) + globalPadding);
+                break;
+            case ORIENTATION_BOTTOM_TOP:
+                position = new Vector(node.getX() + anchor.getX() - root.getWidth() / 2, anchor.getY() -
+                        (node.getY() * minNodeHeight + (depth * configuration.getLevelSeparation())) + root.getHeight());
+                break;
+            case ORIENTATION_LEFT_RIGHT:
+                position = new Vector(anchor.getX() +
+                        node.getY() * minNodeWidth + (depth * configuration.getLevelSeparation()) + globalPadding,
+                        anchor.getY() + node.getX());
+                break;
+            case ORIENTATION_RIGHT_LEFT:
+                position = new Vector(anchor.getX() - root.getWidth() -
+                        (node.getY() * minNodeWidth + (depth * configuration.getLevelSeparation()) + globalPadding),
+                        node.getX() + anchor.getY());
+        }
+
+        return position;
     }
 
     private List<Node> sortByLevel(Graph graph) {
@@ -369,5 +430,7 @@ public class BuchheimWalkerAlgorithm implements Algorithm {
     @Override
     public void setMeasuredDimension(int width, int height) {
         this.width = width;
+        this.height = height;
+        anchor = getAnchor();
     }
 }

@@ -94,7 +94,7 @@ public class Graph {
         return false;
     }
 
-    public List<Node> findSuccessors(Node node) {
+    public List<Node> successorsOf(Node node) {
         List<Node> successors = new ArrayList<>();
         for(Edge edge : edges) {
             if(edge.getSource().equals(node)) {
@@ -105,7 +105,7 @@ public class Graph {
         return successors;
     }
 
-    public List<Node> findPredecessors(Node node) {
+    public List<Node> predecessorsOf(Node node) {
         List<Node> predecessors = new ArrayList<>();
         for(Edge edge : edges) {
             if(edge.getDestination().equals(node)) {

@@ -18,7 +18,7 @@ import de.blox.graphview.Node;
 /**
  *
  */
-public class FruchtermanReingold implements Algorithm {
+public class FruchtermanReingoldAlgorithm implements Algorithm {
     public static final int DEFAULT_ITERATIONS = 1000;
 
     private static final double EPSILON = 0.0001D;
@@ -29,16 +29,16 @@ public class FruchtermanReingold implements Algorithm {
     private Random rand = new Random(SEED);
     private int width;
     private int height;
-    private double k;
-    private double t;
-    private double attraction_k;
-    private double repulsion_k;
+    private float k;
+    private float t;
+    private float attraction_k;
+    private float repulsion_k;
 
-    public FruchtermanReingold() {
+    public FruchtermanReingoldAlgorithm() {
         this(DEFAULT_ITERATIONS);
     }
 
-    public FruchtermanReingold(int iterations) {
+    public FruchtermanReingoldAlgorithm(int iterations) {
         this.iterations = iterations;
     }
 
@@ -65,8 +65,8 @@ public class FruchtermanReingold implements Algorithm {
 
     private void limitMaximumDisplacement(List<Node> nodes) {
         for (Node v : nodes) {
-            double dispLength = Math.max(EPSILON, getDisp(v).length());
-            v.setPos(v.getPosition().add(getDisp(v).divide(dispLength).multiply(Math.min(dispLength, t))));
+            float dispLength = (float) Math.max(EPSILON, getDisp(v).length());
+            v.setPos(v.getPosition().add(getDisp(v).divide(dispLength).multiply((float) Math.min(dispLength, t))));
         }
     }
 
@@ -76,7 +76,7 @@ public class FruchtermanReingold implements Algorithm {
             final Node u = e.getDestination();
 
             Vector delta = v.getPosition().subtract(u.getPosition());
-            double deltaLength = Math.max(EPSILON, delta.length());
+            float deltaLength = (float) Math.max(EPSILON, delta.length());
             setDisp(v, getDisp(v).subtract(delta.divide(deltaLength).multiply(forceAttraction(deltaLength))));
             setDisp(u, getDisp(u).add((delta.divide(deltaLength).multiply(forceAttraction(deltaLength)))));
         }
@@ -87,18 +87,18 @@ public class FruchtermanReingold implements Algorithm {
             for (Node u : nodes) {
                 if (!u.equals(v)) {
                     Vector delta = v.getPosition().subtract(u.getPosition());
-                    double deltaLength = Math.max(EPSILON, delta.length());
+                    float deltaLength = (float) Math.max(EPSILON, delta.length());
                     setDisp(v, getDisp(v).add(delta.divide(deltaLength).multiply(forceRepulsion(deltaLength))));
                 }
             }
         }
     }
 
-    private double forceAttraction(double x) {
+    private float forceAttraction(float x) {
         return (x * x) / attraction_k;
     }
 
-    private double forceRepulsion(double x) {
+    private float forceRepulsion(float x) {
         return (repulsion_k * repulsion_k) / x;
     }
 
@@ -115,11 +115,11 @@ public class FruchtermanReingold implements Algorithm {
         final List<Node> nodes = graph.getNodes();
         final List<Edge> edges = graph.getEdges();
 
-        t = 0.1 * Math.sqrt(width/2 * height/2);
-        k = 0.75 * Math.sqrt(width * height / nodes.size());
+        t = (float) (0.1 * Math.sqrt(width/2 * height/2));
+        k = (float) (0.75 * Math.sqrt(width * height / nodes.size()));
 
-        attraction_k = 0.75 * k;
-        repulsion_k = 0.75 * k;
+        attraction_k = 0.75f * k;
+        repulsion_k = 0.75f * k;
 
         randomize(nodes);
 
@@ -133,7 +133,6 @@ public class FruchtermanReingold implements Algorithm {
             cool(i);
 
             if(done()) {
-                System.out.println("Done" + i);
                 break;
             }
         }

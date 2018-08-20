@@ -42,7 +42,12 @@ public class BuchheimWalkerActivity extends GraphActivity {
 
     @Override
     public void setAlgorithm(GraphAdapter adapter) {
-        final BuchheimWalkerConfiguration configuration = new BuchheimWalkerConfiguration(100, 100, 500);
+        final BuchheimWalkerConfiguration configuration = new BuchheimWalkerConfiguration.Builder()
+                .setSiblingSeparation(100)
+                .setLevelSeparation(300)
+                .setSubtreeSeparation(300)
+                .setOrientation(BuchheimWalkerConfiguration.ORIENTATION_TOP_BOTTOM)
+                .build();
         adapter.setAlgorithm(new BuchheimWalkerAlgorithm(configuration));
     }
 }
