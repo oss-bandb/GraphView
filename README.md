@@ -1,23 +1,20 @@
-TreeView
+GraphView
 ===========
 
-Android TreeView is used to display data in tree structures.
-
-![alt Example](TreeView.png "Example")
+Android GraphView is used to display data in graph structures.
 
 Overview
 ========
-The library is designed to support different algorithms. Currently, only the algorithm from Walker (with the runtime improvements from Buchheim) has been implemented. Feel free to contribute. The algorithm should only implement the `Algorithm` Interface.
+The library is designed to support different algorithms. Currently, only the algorithms from Walker (with the runtime improvements from Buchheim) and Fruchterman&Reingold (for small graphs) have been implemented.
 
 Download
 ========
 
 ```groovy
 dependencies {
-    implementation 'de.blox.treeview:treeview:0.1.3'
+    implementation 'de.blox:graphview:0.2.0'
 }
 ```
-
 Usage
 ======
 
@@ -25,11 +22,11 @@ Usage
 <LinearLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-    <de.blox.treeview.TreeView
-     android:id="@+id/treeview"
+    <de.blox.graphview.GraphView
+     android:id="@+id/graph"
      android:layout_width="match_parent"
      android:layout_height="match_parent">
-    </de.blox.treeview.TreeView>
+    </de.blox.graphview.GraphView>
 </LinearLayout>
 ```
 You can make the node Layout how you like. Just define a layout file, e.g. ```node.xml``` ...
@@ -65,15 +62,15 @@ You can make the node Layout how you like. Just define a layout file, e.g. ```no
 
 ```java
 public class MainActivity extends AppCompatActivity {
-    private int nodeCount = 0;
+    private int nodeCount = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        TreeView treeView = findViewById(R.id.tree);
+        GraphView graphView = findViewById(R.id.graph);
 
-        BaseTreeAdapter adapter = new BaseTreeAdapter<ViewHolder>(this, R.layout.node) {
+        BaseGraphAdapter adapter = new BaseGraphAdapter<ViewHolder>(this, R.layout.node) {
             @NonNull
             @Override
             public ViewHolder onCreateViewHolder(View view) {
@@ -85,24 +82,39 @@ public class MainActivity extends AppCompatActivity {
                 viewHolder.mTextView.setText(data.toString());
             }
         };
-        treeView.setAdapter(adapter);
+        graphView.setAdapter(adapter);
         
         // example tree
-        TreeNode rootNode = new TreeNode(getNodeText());
-        rootNode.addChild(new TreeNode(getNodeText()));
-        final TreeNode child3 = new TreeNode(getNodeText());
-        child3.addChild(new TreeNode(getNodeText()));
-        final TreeNode child6 = new TreeNode(getNodeText());
-        child6.addChild(new TreeNode(getNodeText()));
-        child6.addChild(new TreeNode(getNodeText()));
-        child3.addChild(child6);
-        rootNode.addChild(child3);
-        final TreeNode child4 = new TreeNode(getNodeText());
-        child4.addChild(new TreeNode(getNodeText()));
-        child4.addChild(new TreeNode(getNodeText()));
-        rootNode.addChild(child4);
+        final Graph graph = new Graph();
+        final Node node1 = new Node(getNodeText());
+        final Node node2 = new Node(getNodeText());
+        final Node node3 = new Node(getNodeText());
+        final Node node4 = new Node(getNodeText());
+        final Node node5 = new Node(getNodeText());
+        final Node node6 = new Node(getNodeText());
+        final Node node8 = new Node(getNodeText());
+        final Node node7 = new Node(getNodeText());
+        final Node node9 = new Node(getNodeText());
+        final Node node10 = new Node(getNodeText());
+        final Node node11 = new Node(getNodeText());
+        final Node node12 = new Node(getNodeText());
 
-        adapter.setRootNode(rootNode);
+        graph.addEdge(node1, node2);
+        graph.addEdge(node1, node3);
+        graph.addEdge(node1, node4);
+        graph.addEdge(node2, node5);
+        graph.addEdge(node2, node6);
+        graph.addEdge(node6, node7);
+        graph.addEdge(node6, node8);
+        graph.addEdge(node4, node9);
+        graph.addEdge(node4, node10);
+        graph.addEdge(node4, node11);
+        graph.addEdge(node11, node12);
+
+        // set the algorithm here 
+        final BuchheimWalkerConfiguration configuration = new BuchheimWalkerConfiguration(100, 100, 200);
+        adapter.setAlgorithm(new BuchheimWalker(configuration));
+        adapter.setGraph(graph);
     }
     
     private String getNodeText() {
@@ -129,10 +141,17 @@ To use the custom attributes you have to add the namespace first: ```
 
 | Attribute        | Format    | Example                        | Explanation|
 |------------------|-----------|--------------------------------|------------|
-| levelSeparation | Dimension | 50dp                           | How much space should be used between levels
 | lineThickness   | Dimension | 10dp                           | Set how thick the connection lines should be
 | lineColor       | Color     | "@android:color/holo_red_dark" | Set the color of the connection lines
 | useMaxSize      | Boolean   | true                           | Use the same size for each node
+
+Examples
+========
+#### Rooted Tree
+![alt Example](Tree.png "Tree Example")
+
+#### Directed Graph
+![alt Example](Graph.png "Graph Example")
 
 License
 =======

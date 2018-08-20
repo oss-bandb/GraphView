@@ -5,7 +5,7 @@ android {
     buildToolsVersion "27.0.3"
 
     defaultConfig {
-        applicationId "de.blox.treeview.sample"
+        applicationId "de.blox.graphview.sample"
         minSdkVersion 14
         targetSdkVersion 27
         versionCode 1
@@ -23,6 +23,8 @@ android {
 }
 
 dependencies {
+    implementation 'com.android.support:support-v4:27.1.1'
+    implementation 'com.android.support:recyclerview-v7:27.1.1'
     compile fileTree(dir: 'libs', include: ['*.jar'])
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
@@ -33,5 +35,5 @@ dependencies {
     implementation 'com.android.support.constraint:constraint-layout:1.1.2'
     implementation 'com.android.support:design:27.1.1'
     testCompile 'junit:junit:4.12'
-    implementation project(path: ':treeview')
+    implementation project(path: ':graphview')
 }

@@ -1,1 +1,1 @@
-include ':treeview', ':sample'
+include ':graphview', ':sample'
