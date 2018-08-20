@@ -12,4 +12,6 @@
         <item name="colorControlHighlight">@color/colorAccent</item>
         <item name="colorAccent">@android:color/white</item>
     </style>
+    <style name="PopupOverlay" parent="ThemeOverlay.AppCompat.Light"/>
+    <style name="AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar"/>
 </resources>

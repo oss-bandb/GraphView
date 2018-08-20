@@ -2,9 +2,9 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/TreeView.iml" filepath="$PROJECT_DIR$/TreeView.iml" />
+      <module fileurl="file://$PROJECT_DIR$/GraphView.iml" filepath="$PROJECT_DIR$/GraphView.iml" />
+      <module fileurl="file://$PROJECT_DIR$/graphview/graphview.iml" filepath="$PROJECT_DIR$/graphview/graphview.iml" />
       <module fileurl="file://$PROJECT_DIR$/sample/sample.iml" filepath="$PROJECT_DIR$/sample/sample.iml" />
-      <module fileurl="file://$PROJECT_DIR$/treeview/treeview.iml" filepath="$PROJECT_DIR$/treeview/treeview.iml" />
     </modules>
   </component>
 </project>
