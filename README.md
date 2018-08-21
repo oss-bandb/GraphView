@@ -3,6 +3,8 @@ GraphView
 
 Android GraphView is used to display data in graph structures.
 
+![alt Logo](image/GraphView_logo.png "Graph Logo")
+
 Overview
 ========
 The library is designed to support different algorithms. Currently, only the algorithms from Walker (with the runtime improvements from Buchheim) and Fruchterman&Reingold (for small graphs) have been implemented.
@@ -70,20 +72,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         GraphView graphView = findViewById(R.id.graph);
 
-        final BaseGraphAdapter<ViewHolder> adapter = new BaseGraphAdapter<ViewHolder>(this, R.layout.node, graph) {
-            @NonNull
-            @Override
-            public ViewHolder onCreateViewHolder(View view) {
-                return new ViewHolder(view);
-            }
-
-            @Override
-            public void onBindViewHolder(ViewHolder viewHolder, Object data, int position) {
-                viewHolder.mTextView.setText(data.toString());
-            }
-        };
-        graphView.setAdapter(adapter);
-        
         // example tree
         final Graph graph = new Graph();
         final Node node1 = new Node(getNodeText());
@@ -111,7 +99,22 @@ public class MainActivity extends AppCompatActivity {
         graph.addEdge(node4, node11);
         graph.addEdge(node11, node12);
 
-        // set the algorithm here 
+        // you can set the graph via the constructor or use the adapter.setGraph(Graph) method
+        final BaseGraphAdapter<ViewHolder> adapter = new BaseGraphAdapter<ViewHolder>(this, R.layout.node, graph) {
+            @NonNull
+            @Override
+            public ViewHolder onCreateViewHolder(View view) {
+                return new ViewHolder(view);
+            }
+
+            @Override
+            public void onBindViewHolder(ViewHolder viewHolder, Object data, int position) {
+                viewHolder.mTextView.setText(data.toString());
+            }
+        };
+        graphView.setAdapter(adapter);
+        
+        // set the algorithm here
         final BuchheimWalkerConfiguration configuration = new BuchheimWalkerConfiguration.Builder()
                 .setSiblingSeparation(100)
                 .setLevelSeparation(300)
@@ -119,7 +122,6 @@ public class MainActivity extends AppCompatActivity {
                 .setOrientation(BuchheimWalkerConfiguration.ORIENTATION_TOP_BOTTOM)
                 .build();
         adapter.setAlgorithm(new BuchheimWalkerAlgorithm(configuration));
-        adapter.setGraph(graph);
     }
     
     private String getNodeText() {
@@ -153,10 +155,10 @@ To use the custom attributes you have to add the namespace first: ```
 Examples
 ========
 #### Rooted Tree
-![alt Example](Tree.png "Tree Example")
+![alt Example](image/Tree.png "Tree Example")
 
 #### Directed Graph
-![alt Example](Graph.png "Graph Example")
+![alt Example](image/Graph.png "Graph Example")
 
 License
 =======
