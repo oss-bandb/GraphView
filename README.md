@@ -12,7 +12,7 @@ Download
 
 ```groovy
 dependencies {
-    implementation 'de.blox:graphview:0.3.0'
+    implementation 'de.blox:graphview:0.4.0'
 }
 ```
 Usage
@@ -149,6 +149,10 @@ To use the custom attributes you have to add the namespace first: ```
 | lineThickness   | Dimension | 10dp                           | Set how thick the connection lines should be
 | lineColor       | Color     | "@android:color/holo_red_dark" | Set the color of the connection lines
 | useMaxSize      | Boolean   | true                           | Use the same size for each node
+
+Each of the attributes has a corresponding setter in the GraphView class, if you want to use it programmatically.
+
+GraphView internally uses [ZoomLayout](https://github.com/natario1/ZoomLayout)  for its zoom feature. To change the zoom values just use the different attributes described in the ZoomLayout project site.
 
 Examples
 ========

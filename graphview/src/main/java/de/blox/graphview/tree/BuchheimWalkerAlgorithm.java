@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -14,6 +15,7 @@ import de.blox.graphview.Algorithm;
 import de.blox.graphview.EdgeRenderer;
 import de.blox.graphview.Graph;
 import de.blox.graphview.Node;
+import de.blox.graphview.Size;
 import de.blox.graphview.Vector;
 
 import static de.blox.graphview.tree.BuchheimWalkerConfiguration.ORIENTATION_BOTTOM_TOP;
@@ -28,9 +30,8 @@ public class BuchheimWalkerAlgorithm implements Algorithm {
     private EdgeRenderer edgeRenderer;
     private int minNodeHeight = Integer.MAX_VALUE;
     private int minNodeWidth = Integer.MAX_VALUE;
-    private int width;
-    private int height;
-    private Vector anchor;
+    private int maxNodeWidth = Integer.MIN_VALUE;
+    private int maxNodeHeight = Integer.MIN_VALUE;
 
     public BuchheimWalkerAlgorithm(BuchheimWalkerConfiguration configuration) {
         this.configuration = configuration;
@@ -44,6 +45,7 @@ public class BuchheimWalkerAlgorithm implements Algorithm {
         this(new BuchheimWalkerConfiguration.Builder().build());
     }
 
+    @SuppressWarnings("UseCompareMethod")
     private static int compare(int x, int y) {
         return (x < y) ? -1 : ((x == y) ? 0 : 1);
     }
@@ -60,34 +62,14 @@ public class BuchheimWalkerAlgorithm implements Algorithm {
         return mNodeData.get(node);
     }
 
-    private Vector getAnchor() {
-        if (anchor != null) {
-            return anchor;
-        }
-
-        switch (configuration.getOrientation()) {
-            case ORIENTATION_TOP_BOTTOM:
-                anchor = new Vector(width / 2, 0);
-                break;
-            case ORIENTATION_BOTTOM_TOP:
-                anchor = new Vector(width / 2, height);
-                break;
-            case ORIENTATION_LEFT_RIGHT:
-                anchor = new Vector(0, height / 2);
-                break;
-            case ORIENTATION_RIGHT_LEFT:
-                anchor = new Vector(width, height / 2);
-        }
-
-        return anchor;
-    }
-
     private void firstWalk(Graph graph, Node node, int depth, int number) {
         BuchheimWalkerNodeData nodeData = createNodeData(node);
         nodeData.setDepth(depth);
         nodeData.setNumber(number);
         minNodeHeight = Math.min(minNodeHeight, node.getHeight());
         minNodeWidth = Math.min(minNodeWidth, node.getWidth());
+        maxNodeWidth = Math.max(maxNodeWidth, node.getWidth());
+        maxNodeHeight = Math.max(maxNodeHeight, node.getHeight());
 
         if (isLeaf(graph, node)) {
             // if the node has no left sibling, prelim(node) should be set to 0, but we don't have to set it
@@ -112,7 +94,10 @@ public class BuchheimWalkerAlgorithm implements Algorithm {
 
             executeShifts(graph, node);
 
-            double midPoint = 0.5 * ((getPrelim(leftMost) + getPrelim(rightMost) + rightMost.getWidth()) - node.getWidth());
+            final boolean isVertical = isVertical();
+            double midPoint = 0.5 * ((getPrelim(leftMost) + getPrelim(rightMost)
+                    + (isVertical ? rightMost.getWidth() : rightMost.getHeight()))
+                    - (isVertical ? node.getWidth() : node.getHeight()));
 
             if (hasLeftSibling(graph, node)) {
                 Node leftSibling = getLeftSibling(graph, node);
@@ -126,11 +111,22 @@ public class BuchheimWalkerAlgorithm implements Algorithm {
 
     private void secondWalk(Graph graph, Node node, double modifier) {
         BuchheimWalkerNodeData nodeData = getNodeData(node);
-        node.setPos(new Vector((float) (nodeData.getPrelim() + modifier), nodeData.getDepth()));
+        final int depth = nodeData.getDepth();
+
+        final boolean vertical = isVertical();
+        node.setPos(new Vector((float) (nodeData.getPrelim() + modifier),
+                depth * (vertical ? minNodeHeight : minNodeWidth) + depth * configuration.getLevelSeparation()));
 
         for (Node w : graph.successorsOf(node)) {
             secondWalk(graph, w, modifier + nodeData.getModifier());
         }
+    }
+
+    private boolean isVertical() {
+        final int orientation = configuration.getOrientation();
+
+        return orientation == ORIENTATION_TOP_BOTTOM ||
+                orientation == ORIENTATION_BOTTOM_TOP;
     }
 
 
@@ -270,12 +266,8 @@ public class BuchheimWalkerAlgorithm implements Algorithm {
             separation = configuration.getSiblingSeparation();
         }
 
-        final int orientation = configuration.getOrientation();
-        boolean vertical = orientation == ORIENTATION_TOP_BOTTOM || orientation == ORIENTATION_BOTTOM_TOP;
-
-        return separation + (int) (0.5 *
-                (vertical ? leftNode.getWidth() + rightNode.getWidth()
-                        : leftNode.getHeight() + rightNode.getHeight()));
+        boolean vertical = isVertical();
+        return separation + (vertical ? leftNode.getWidth() : leftNode.getHeight());
     }
 
     private boolean isSibling(Graph graph, Node leftNode, Node rightNode) {
@@ -352,7 +344,7 @@ public class BuchheimWalkerAlgorithm implements Algorithm {
         final Node firstNode = graph.getNode(0);
         firstWalk(graph, firstNode, 0, 0);
 
-        secondWalk(graph, firstNode, -getPrelim(firstNode));
+        secondWalk(graph, firstNode, 0);
 
         positionNodes(graph);
     }
@@ -360,77 +352,171 @@ public class BuchheimWalkerAlgorithm implements Algorithm {
     private void positionNodes(Graph graph) {
         int globalPadding = 0;
         int localPadding = 0;
-        int currentLevel = 0;
+        Vector offset = getOffset(graph);
 
+        final int orientation = configuration.getOrientation();
+        final boolean needReverseOrder = orientation == ORIENTATION_BOTTOM_TOP
+                || orientation == ORIENTATION_RIGHT_LEFT;
+        List<Node> nodes = sortByLevel(graph, needReverseOrder);
 
-        for (Node node : sortByLevel(graph)) {
-            final int height = node.getHeight();
-            if (height > minNodeHeight) {
-                localPadding = Math.max(localPadding, height - minNodeHeight);
-            }
+        int firstLevel = getNodeData(nodes.get(0)).getDepth();
+        Size localMaxSize = findMaxSize(filterByLevel(nodes, firstLevel));
+        int currentLevel = needReverseOrder ? firstLevel : 0;
 
+        for (Node node : nodes) {
             int depth = getNodeData(node).getDepth();
             if (depth != currentLevel) {
-                globalPadding += localPadding;
+                switch (configuration.getOrientation()) {
+                    case ORIENTATION_TOP_BOTTOM:
+                    case ORIENTATION_LEFT_RIGHT:
+                        globalPadding += localPadding;
+                        break;
+                    case ORIENTATION_BOTTOM_TOP:
+                    case ORIENTATION_RIGHT_LEFT:
+                        globalPadding -= localPadding;
+                        break;
+                }
                 localPadding = 0;
                 currentLevel = depth;
+
+                localMaxSize = findMaxSize(filterByLevel(nodes, currentLevel));
             }
 
-            node.setPos(getPosition(node, globalPadding, graph));
+            final int height = node.getHeight();
+            final int width = node.getWidth();
+            switch (configuration.getOrientation()) {
+                case ORIENTATION_TOP_BOTTOM:
+                    if (height > minNodeHeight) {
+                        int diff = height - minNodeHeight;
+                        localPadding = Math.max(localPadding, diff);
+                    }
+                    break;
+                case ORIENTATION_BOTTOM_TOP:
+                    if (height < localMaxSize.getHeight()) {
+                        int diff = localMaxSize.getHeight() - height;
+                        node.setPos(node.getPosition().subtract(new Vector(0, diff)));
+                        localPadding = Math.max(localPadding, diff);
+                    }
+                    break;
+                case ORIENTATION_LEFT_RIGHT:
+                    if (width > minNodeWidth) {
+                        int diff = width - minNodeWidth;
+                        localPadding = Math.max(localPadding, diff);
+                    }
+                    break;
+                case ORIENTATION_RIGHT_LEFT:
+                    if (width < localMaxSize.getWidth()) {
+                        int diff = localMaxSize.getWidth() - width;
+                        node.setPos(node.getPosition().subtract(new Vector(0, diff)));
+                        localPadding = Math.max(localPadding, diff);
+                    }
+                    break;
+            }
+
+            node.setPos(getPosition(node, globalPadding, offset));
         }
     }
 
-    private Vector getPosition(Node node, int globalPadding, Graph graph) {
-        final int depth = getNodeData(node).getDepth();
-        final Node root = graph.getNode(0);
+    private Size findMaxSize(List<Node> nodes) {
+        int width = Integer.MIN_VALUE;
+        int height = Integer.MIN_VALUE;
+
+        for (Node node : nodes) {
+            width = Math.max(width, node.getWidth());
+            height = Math.max(height, node.getHeight());
+        }
+
+        return new Size(width, height);
+    }
+
+    private Vector getOffset(Graph graph) {
+        float offsetX = Float.MAX_VALUE;
+        float offsetY = Float.MAX_VALUE;
+        switch (configuration.getOrientation()) {
+            case ORIENTATION_BOTTOM_TOP:
+            case ORIENTATION_RIGHT_LEFT:
+                offsetY = Float.MIN_VALUE;
+                break;
+        }
+
+        final int orientation = configuration.getOrientation();
+        for (Node node : graph.getNodes()) {
+            switch (orientation) {
+                case ORIENTATION_TOP_BOTTOM:
+                case ORIENTATION_LEFT_RIGHT:
+                    offsetX = Math.min(offsetX, node.getX());
+                    offsetY = Math.min(offsetY, node.getY());
+                    break;
+                case ORIENTATION_BOTTOM_TOP:
+                case ORIENTATION_RIGHT_LEFT:
+                    offsetX = Math.min(offsetX, node.getX());
+                    offsetY = Math.max(offsetY, node.getY());
+                    break;
+            }
+        }
+        return new Vector(offsetX, offsetY);
+    }
+
+    private Vector getPosition(Node node, int globalPadding, Vector offset) {
         Vector position = null;
         switch (configuration.getOrientation()) {
             case ORIENTATION_TOP_BOTTOM:
-                position = new Vector(node.getX() + anchor.getX() - root.getWidth() / 2, anchor.getY() +
-                        node.getY() * minNodeHeight + (depth * configuration.getLevelSeparation()) + globalPadding);
+                position = new Vector(node.getX() - offset.getX(),
+                        node.getY() + globalPadding);
                 break;
             case ORIENTATION_BOTTOM_TOP:
-                position = new Vector(node.getX() + anchor.getX() - root.getWidth() / 2, anchor.getY() -
-                        (node.getY() * minNodeHeight + (depth * configuration.getLevelSeparation())) + root.getHeight());
+                position = new Vector(node.getX() - offset.getX(),
+                        offset.getY() - node.getY() - globalPadding);
                 break;
             case ORIENTATION_LEFT_RIGHT:
-                position = new Vector(anchor.getX() +
-                        node.getY() * minNodeWidth + (depth * configuration.getLevelSeparation()) + globalPadding,
-                        anchor.getY() + node.getX());
+                position = new Vector(node.getY() + globalPadding,
+                        node.getX() - offset.getX());
                 break;
             case ORIENTATION_RIGHT_LEFT:
-                position = new Vector(anchor.getX() - root.getWidth() -
-                        (node.getY() * minNodeWidth + (depth * configuration.getLevelSeparation()) + globalPadding),
-                        node.getX() + anchor.getY());
+                position = new Vector(offset.getY() - node.getY() - globalPadding,
+                        node.getX() - offset.getX());
         }
 
         return position;
     }
 
-    private List<Node> sortByLevel(Graph graph) {
+    private List<Node> sortByLevel(Graph graph, boolean descending) {
         List<Node> nodes = new ArrayList<>(graph.getNodes());
-
-        Collections.sort(nodes, new Comparator<Node>() {
+        Comparator<Node> comparator = new Comparator<Node>() {
             @Override
             public int compare(Node o1, Node o2) {
                 final BuchheimWalkerNodeData data1 = getNodeData(o1);
                 final BuchheimWalkerNodeData data2 = getNodeData(o2);
                 return BuchheimWalkerAlgorithm.compare(data1.getDepth(), data2.getDepth());
             }
-        });
+        };
+
+        if(descending) {
+            comparator = Collections.reverseOrder(comparator);
+        }
+
+        Collections.sort(nodes, comparator);
 
         return nodes;
+    }
+
+    private List<Node> filterByLevel(List<Node> nodes, int level) {
+        List<Node> nodeList = new ArrayList<>(nodes);
+
+        Iterator<Node> iterator = nodeList.iterator();
+        while(iterator.hasNext()) {
+            Node node = iterator.next();
+            int depth = getNodeData(node).getDepth();
+            if(depth != level) {
+                iterator.remove();
+            }
+        }
+
+        return nodeList;
     }
 
     @Override
     public void drawEdges(Canvas canvas, Graph graph, Paint linePaint) {
         edgeRenderer.render(canvas, graph, linePaint);
-    }
-
-    @Override
-    public void setMeasuredDimension(int width, int height) {
-        this.width = width;
-        this.height = height;
-        anchor = getAnchor();
     }
 }

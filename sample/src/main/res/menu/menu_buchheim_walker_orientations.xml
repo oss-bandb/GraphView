@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/topToBottom"
+        android:title="Top to Bottom"/>
+    <item
+        android:id="@+id/bottomToTop"
+        android:title="Bottom to Top"/>
+    <item
+        android:id="@+id/leftToRight"
+        android:title="Left to Right"/>
+    <item
+        android:id="@+id/rightToLeft"
+        android:title="Right to Left"/>
+</menu>

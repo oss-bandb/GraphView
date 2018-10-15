@@ -3,6 +3,7 @@ package de.blox.graphview;
 import android.support.annotation.NonNull;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -77,7 +78,7 @@ public class Graph {
     }
 
     public List<Node> getNodes() {
-        return nodes;
+        return Collections.unmodifiableList(nodes);
     }
 
     public List<Edge> getEdges() {

@@ -10,6 +10,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import de.blox.graphview.BaseGraphAdapter;
 import de.blox.graphview.Graph;
@@ -17,11 +18,10 @@ import de.blox.graphview.GraphAdapter;
 import de.blox.graphview.GraphView;
 import de.blox.graphview.Node;
 
-import static android.support.design.widget.Snackbar.LENGTH_SHORT;
-
 public abstract class GraphActivity extends AppCompatActivity {
     private int nodeCount = 1;
     private Node currentNode;
+    protected BaseGraphAdapter<ViewHolder> adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,7 +37,7 @@ public abstract class GraphActivity extends AppCompatActivity {
     private void setupAdapter(Graph graph) {
         final GraphView graphView = findViewById(R.id.graph);
 
-        final BaseGraphAdapter<ViewHolder> adapter = new BaseGraphAdapter<ViewHolder>(this, R.layout.node, graph) {
+        adapter = new BaseGraphAdapter<ViewHolder>(this, R.layout.node, graph) {
             @NonNull
             @Override
             public ViewHolder onCreateViewHolder(View view) {
@@ -46,7 +46,7 @@ public abstract class GraphActivity extends AppCompatActivity {
 
             @Override
             public void onBindViewHolder(ViewHolder viewHolder, Object data, int position) {
-                viewHolder.mTextView.setText(data.toString());
+                viewHolder.textView.setText(data.toString());
             }
         };
 
@@ -57,7 +57,7 @@ public abstract class GraphActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 currentNode = adapter.getNode(position);
-                Snackbar.make(graphView, "Clicked on " + currentNode.getData().toString(), LENGTH_SHORT).show();
+                Snackbar.make(graphView, "Clicked on " + currentNode.getData().toString(), Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -95,10 +95,10 @@ public abstract class GraphActivity extends AppCompatActivity {
     public abstract void setAlgorithm(GraphAdapter adapter);
 
     private class ViewHolder {
-        TextView mTextView;
+        TextView textView;
 
         ViewHolder(View view) {
-            mTextView = view.findViewById(R.id.textView);
+            textView = view.findViewById(R.id.textView);
         }
     }
 

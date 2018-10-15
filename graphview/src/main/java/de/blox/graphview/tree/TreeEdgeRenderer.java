@@ -21,6 +21,7 @@ import static de.blox.graphview.tree.BuchheimWalkerConfiguration.ORIENTATION_TOP
 class TreeEdgeRenderer implements EdgeRenderer {
 
     private BuchheimWalkerConfiguration configuration;
+    private Path linePath = new Path();
 
     TreeEdgeRenderer(BuchheimWalkerConfiguration configuration) {
         this.configuration = configuration;
@@ -28,14 +29,13 @@ class TreeEdgeRenderer implements EdgeRenderer {
 
     @Override
     public void render(Canvas canvas, Graph graph, Paint paint) {
-        Path linePath = new Path();
-
         List<Node> nodes = graph.getNodes();
 
         for (Node node : nodes) {
             List<Node> children = graph.successorsOf(node);
 
             for (Node child : children) {
+                linePath.reset();
                 switch (configuration.getOrientation()) {
                     case ORIENTATION_TOP_BOTTOM:
                         // position at the middle-top of the child
@@ -54,7 +54,6 @@ class TreeEdgeRenderer implements EdgeRenderer {
                         linePath.lineTo( node.getX() + (node.getWidth() / 2),
                                 node.getY() + node.getHeight());
 
-                        canvas.drawPath(linePath, paint);
                         break;
                     case ORIENTATION_BOTTOM_TOP:
                         linePath.moveTo( child.getX() + (child.getWidth() / 2),  child.getY() + child.getHeight());
@@ -67,35 +66,33 @@ class TreeEdgeRenderer implements EdgeRenderer {
                         linePath.lineTo( node.getX() + (node.getWidth() / 2),
                                 node.getY() + node.getHeight());
 
-                        canvas.drawPath(linePath, paint);
                         break;
                     case ORIENTATION_LEFT_RIGHT:
                         linePath.moveTo( child.getX(),  child.getY() + child.getHeight() / 2);
                         linePath.lineTo( child.getX() - (configuration.getLevelSeparation() / 2),  child.getY() + child.getHeight() / 2 );
-                        linePath.lineTo( node.getX() + (node.getWidth() + configuration.getLevelSeparation() / 2),
+                        linePath.lineTo( child.getX() - (configuration.getLevelSeparation() / 2),
                                 node.getY() + node.getHeight() / 2);
 
-                        linePath.moveTo( node.getX() + node.getWidth() + configuration.getLevelSeparation() / 2,
+                        linePath.moveTo( child.getX() - (configuration.getLevelSeparation() / 2),
                                 node.getY() + node.getHeight() / 2);
                         linePath.lineTo( node.getX() + (node.getWidth()),
                                 node.getY() + node.getHeight() / 2);
 
-                        canvas.drawPath(linePath, paint);
                         break;
                     case ORIENTATION_RIGHT_LEFT:
                         linePath.moveTo( child.getX() + child.getWidth(),  child.getY() + child.getHeight() / 2);
                         linePath.lineTo( child.getX() + child.getWidth() + (configuration.getLevelSeparation() / 2),  child.getY() + child.getHeight() / 2 );
-                        linePath.lineTo( node.getX() - configuration.getLevelSeparation() / 2,
+                        linePath.lineTo( child.getX() + child.getWidth() + configuration.getLevelSeparation() / 2,
                                 node.getY() + node.getHeight() / 2);
 
-                        linePath.moveTo( node.getX() - configuration.getLevelSeparation() / 2,
+                        linePath.moveTo( child.getX() + child.getWidth() + configuration.getLevelSeparation() / 2,
                                 node.getY() + node.getHeight() / 2);
                         linePath.lineTo( node.getX() + (node.getWidth()),
                                 node.getY() + node.getHeight() / 2);
 
-                        canvas.drawPath(linePath, paint);
                 }
 
+                canvas.drawPath(linePath, paint);
             }
         }
     }

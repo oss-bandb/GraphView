@@ -112,6 +112,10 @@ public class FruchtermanReingoldAlgorithm implements Algorithm {
 
     @Override
     public void run(Graph graph) {
+        final int size = findBiggestSize(graph) * graph.getNodeCount();
+        width = size ;
+        height = size;
+
         final List<Node> nodes = graph.getNodes();
         final List<Edge> edges = graph.getEdges();
 
@@ -136,6 +140,34 @@ public class FruchtermanReingoldAlgorithm implements Algorithm {
                 break;
             }
         }
+
+        positionNodes(graph);
+    }
+
+    private void positionNodes(Graph graph) {
+        Vector offset = getOffset(graph);
+        for (Node node : graph.getNodes()) {
+            node.setPos(new Vector(node.getX() - offset.getX(), node.getY() - offset.getY()));
+        }
+    }
+
+    private int findBiggestSize(Graph graph) {
+        int size = 0;
+        for (Node node : graph.getNodes()) {
+            size = Math.max(size, Math.max(node.getHeight(), node.getWidth()));
+        }
+
+        return size;
+    }
+
+    private Vector getOffset(Graph graph) {
+        float offsetX = Float.MAX_VALUE;
+        float offsetY = Float.MAX_VALUE;
+        for (Node node : graph.getNodes()) {
+            offsetX = Math.min(offsetX, node.getX());
+            offsetY = Math.min(offsetY, node.getY());
+        }
+        return new Vector(offsetX, offsetY);
     }
 
     private boolean done() {
@@ -145,11 +177,5 @@ public class FruchtermanReingoldAlgorithm implements Algorithm {
     @Override
     public void drawEdges(Canvas canvas, Graph graph, Paint linePaint) {
         edgeRenderer.render(canvas, graph, linePaint);
-    }
-
-    @Override
-    public void setMeasuredDimension(int width, int height) {
-        this.width = width;
-        this.height = height;
     }
 }

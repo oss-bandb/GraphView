@@ -1,13 +1,53 @@
 package de.blox.graphview.sample.Algorithms;
 
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+
 import de.blox.graphview.Graph;
 import de.blox.graphview.GraphAdapter;
 import de.blox.graphview.Node;
 import de.blox.graphview.sample.GraphActivity;
+import de.blox.graphview.sample.R;
 import de.blox.graphview.tree.BuchheimWalkerAlgorithm;
 import de.blox.graphview.tree.BuchheimWalkerConfiguration;
 
 public class BuchheimWalkerActivity extends GraphActivity {
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_buchheim_walker_orientations, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        final BuchheimWalkerConfiguration.Builder builder = new BuchheimWalkerConfiguration.Builder()
+                .setSiblingSeparation(100)
+                .setLevelSeparation(300)
+                .setSubtreeSeparation(300);
+
+        switch (item.getItemId()) {
+            case R.id.topToBottom:
+                builder.setOrientation(BuchheimWalkerConfiguration.ORIENTATION_TOP_BOTTOM);
+                break;
+            case R.id.bottomToTop:
+                builder.setOrientation(BuchheimWalkerConfiguration.ORIENTATION_BOTTOM_TOP);
+                break;
+            case R.id.leftToRight:
+                builder.setOrientation(BuchheimWalkerConfiguration.ORIENTATION_LEFT_RIGHT);
+                break;
+            case R.id.rightToLeft:
+                builder.setOrientation(BuchheimWalkerConfiguration.ORIENTATION_RIGHT_LEFT);
+                break;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+        adapter.setAlgorithm(new BuchheimWalkerAlgorithm(builder.build()));
+        adapter.notifyInvalidated();
+        return true;
+    }
 
     @Override
     public Graph createGraph() {
