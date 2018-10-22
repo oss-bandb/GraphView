@@ -26,7 +26,6 @@ public class GraphView extends ZoomLayout {
         super(context, attrs, defStyleAttr);
 
         graphNodeContainerView = new GraphNodeContainerView(context, attrs, defStyleAttr);
-        graphNodeContainerView.setBackgroundColor(getContext().getResources().getColor(android.R.color.holo_blue_light));
         addView(graphNodeContainerView, -1, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
     }
 
