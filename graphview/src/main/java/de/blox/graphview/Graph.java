@@ -15,9 +15,11 @@ public class Graph {
     private List<Edge> edges = new ArrayList<>();
 
     private List<NodeObserver> observers = new ArrayList<>();
+    private boolean isTree = true;
 
     /**
      * Add one {@link Node} to the graph without a connection the other nodes.
+     *
      * @param node
      */
     public void addNode(@NonNull Node node) {
@@ -28,6 +30,7 @@ public class Graph {
 
     /**
      * Add one or more {@link Node Nodes} to the graph without a connection the other nodes.
+     *
      * @param nodes
      */
     public void addNodes(@NonNull Node... nodes) {
@@ -39,11 +42,26 @@ public class Graph {
     /**
      * Remove a {@link Node} from the graph. If the node has a connection with an other node, the connection
      * will be removed too.
+     *
      * @param node
      */
     public void removeNode(@NonNull Node node) {
-        if(!nodes.contains(node)) {
+        removeNodeInternal(node);
+
+        for (NodeObserver observer : observers) {
+            observer.notifyNodeRemoved(node);
+        }
+    }
+
+    private void removeNodeInternal(Node node) {
+        if (!nodes.contains(node)) {
             throw new IllegalArgumentException("Unable to find node in graph.");
+        }
+
+        if (isTree) {
+            for (Node n : successorsOf(node)) {
+                removeNodeInternal(n);
+            }
         }
 
         nodes.remove(node);
@@ -51,19 +69,17 @@ public class Graph {
         final Iterator<Edge> iterator = edges.iterator();
         while (iterator.hasNext()) {
             Edge edge = iterator.next();
-            if(edge.getSource().equals(node) || edge.getDestination().equals(node)) {
+            if (edge.getSource().equals(node) || edge.getDestination().equals(node)) {
                 iterator.remove();
             }
         }
 
-        for(NodeObserver observer : observers) {
-            observer.notifyNodeRemoved(node);
-        }
     }
 
     /**
      * Remove {@link Node Nodes} from the graph. If the node has a connection with an other node, the connection
      * will be removed too.
+     *
      * @param nodes
      */
     public void removeNodes(@NonNull Node... nodes) {
@@ -75,6 +91,7 @@ public class Graph {
     /**
      * Add an edge between two {@link Node Nodes}. Both nodes will be added to the graph, if the graph
      * doesn't contain these nodes already (you don't have to use {@link #addNode(Node)} anymore).
+     *
      * @param source
      * @param destination
      */
@@ -84,7 +101,7 @@ public class Graph {
 
         edges.add(new Edge(source, destination));
 
-        for(NodeObserver observer : observers) {
+        for (NodeObserver observer : observers) {
             observer.notifyInvalidated();
         }
     }
@@ -97,26 +114,32 @@ public class Graph {
         observers.remove(nodeObserver);
     }
 
+    public boolean hasNodes() {
+        return !nodes.isEmpty();
+    }
+
     /**
      * Returns the node at {@code position}.
+     *
      * @param position
      * @return
      */
     public Node getNode(int position) {
-        if(position < 0) {
+        if (position < 0) {
             throw new IllegalArgumentException("position can't be negative");
         }
 
         final int size = nodes.size();
-        if(position >= size) {
+        if (position >= size) {
             throw new IndexOutOfBoundsException("Position: " + position + ", Size: " + size);
         }
-        
+
         return nodes.get(position);
     }
 
     /**
      * Returns the number of nodes in this graph.
+     *
      * @return
      */
     public int getNodeCount() {
@@ -125,6 +148,7 @@ public class Graph {
 
     /**
      * Returns all nodes in this graph.
+     *
      * @return
      */
     public List<Node> getNodes() {
@@ -133,6 +157,7 @@ public class Graph {
 
     /**
      * Returns all edges in this graph.
+     *
      * @return
      */
     public List<Edge> getEdges() {
@@ -140,13 +165,12 @@ public class Graph {
     }
 
     /**
-     *
      * @param node
      * @return
      */
     public boolean hasSuccessor(Node node) {
-        for(Edge edge : edges) {
-            if(edge.getSource().equals(node)) {
+        for (Edge edge : edges) {
+            if (edge.getSource().equals(node)) {
                 return true;
             }
         }
@@ -156,13 +180,14 @@ public class Graph {
 
     /**
      * Finds all successors of {@code node}.
+     *
      * @param node
      * @return
      */
     public List<Node> successorsOf(Node node) {
         List<Node> successors = new ArrayList<>();
-        for(Edge edge : edges) {
-            if(edge.getSource().equals(node)) {
+        for (Edge edge : edges) {
+            if (edge.getSource().equals(node)) {
                 successors.add(edge.getDestination());
             }
         }
@@ -171,18 +196,62 @@ public class Graph {
     }
 
     /**
+     * @param node
+     * @return
+     */
+    public boolean hasPredecessor(Node node) {
+        for (Edge edge : edges) {
+            if (edge.getDestination().equals(node)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Finds all predecessors of {@code node}.
+     *
      * @param node
      * @return
      */
     public List<Node> predecessorsOf(Node node) {
         List<Node> predecessors = new ArrayList<>();
-        for(Edge edge : edges) {
-            if(edge.getDestination().equals(node)) {
+        for (Edge edge : edges) {
+            if (edge.getDestination().equals(node)) {
                 predecessors.add(edge.getSource());
             }
         }
 
         return predecessors;
+    }
+
+    public boolean contains(Node node) {
+        return nodes.contains(node);
+    }
+
+    public boolean containsData(Object data) {
+        for (Node node : nodes) {
+            if (node.getData().equals(data)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public Node getNode(Object data) {
+        for (Node node : nodes) {
+            if (node.getData().equals(data)) {
+                return node;
+            }
+        }
+
+        return null;
+    }
+
+    // Todo this is a quick fix and should be removed later
+    public void setAsTree(boolean isTree) {
+        this.isTree = isTree;
     }
 }

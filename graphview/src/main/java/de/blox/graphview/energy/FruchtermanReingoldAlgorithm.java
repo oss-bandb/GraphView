@@ -2,29 +2,32 @@ package de.blox.graphview.energy;
 
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.graphics.RectF;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-import de.blox.graphview.Vector;
 import de.blox.graphview.Algorithm;
 import de.blox.graphview.Edge;
 import de.blox.graphview.EdgeRenderer;
 import de.blox.graphview.Graph;
 import de.blox.graphview.Node;
+import de.blox.graphview.Vector;
 
 /**
  *
  */
 public class FruchtermanReingoldAlgorithm implements Algorithm {
     public static final int DEFAULT_ITERATIONS = 1000;
-
+    public static final int CLUSTER_PADDING = 100;
     private static final double EPSILON = 0.0001D;
     private static final long SEED = 401678L;
-    private final EdgeRenderer edgeRenderer = new EnergyEdgeRenderer();
     private final int iterations;
+    private EdgeRenderer edgeRenderer = new EnergyEdgeRenderer();
     private Map<Node, Vector> disps = new HashMap<>();
     private Random rand = new Random(SEED);
     private int width;
@@ -53,9 +56,7 @@ public class FruchtermanReingoldAlgorithm implements Algorithm {
         for (Node node : nodes) {
             // create meta data for each node
             disps.put(node, new Vector());
-            if (node.getPosition() == null) {
-                node.setPos(new Vector(randInt(rand, 0, width), randInt(rand, 0, height)));
-            }
+            node.setPos(new Vector(randInt(rand, 0, width / 2), randInt(rand, 0, height / 2)));
         }
     }
 
@@ -113,13 +114,13 @@ public class FruchtermanReingoldAlgorithm implements Algorithm {
     @Override
     public void run(Graph graph) {
         final int size = findBiggestSize(graph) * graph.getNodeCount();
-        width = size ;
+        width = size;
         height = size;
 
         final List<Node> nodes = graph.getNodes();
         final List<Edge> edges = graph.getEdges();
 
-        t = (float) (0.1 * Math.sqrt(width/2 * height/2));
+        t = (float) (0.1 * Math.sqrt(width / 2 * height / 2));
         k = (float) (0.75 * Math.sqrt(width * height / nodes.size()));
 
         attraction_k = 0.75f * k;
@@ -136,7 +137,7 @@ public class FruchtermanReingoldAlgorithm implements Algorithm {
 
             cool(i);
 
-            if(done()) {
+            if (done()) {
                 break;
             }
         }
@@ -146,9 +147,97 @@ public class FruchtermanReingoldAlgorithm implements Algorithm {
 
     private void positionNodes(Graph graph) {
         Vector offset = getOffset(graph);
+        List<Node> nodesVisited = new ArrayList<>();
+        List<NodeCluster> nodeClusters = new ArrayList<>();
         for (Node node : graph.getNodes()) {
             node.setPos(new Vector(node.getX() - offset.getX(), node.getY() - offset.getY()));
         }
+
+        for (Node node : graph.getNodes()) {
+            if (nodesVisited.contains(node)) {
+                continue;
+            }
+
+            nodesVisited.add(node);
+            NodeCluster cluster = findClusterOf(nodeClusters, node);
+            if (cluster == null) {
+                cluster = new NodeCluster();
+                cluster.add(node);
+                nodeClusters.add(cluster);
+            }
+
+            followEdges(graph, cluster, node, nodesVisited);
+        }
+
+        positionCluster(nodeClusters);
+    }
+
+    private void positionCluster(List<NodeCluster> nodeClusters) {
+        combineSingleNodeCluster(nodeClusters);
+
+        NodeCluster cluster = nodeClusters.get(0);
+        // move first cluster to 0,0
+        cluster.offset(-cluster.rect.left, -cluster.rect.top);
+
+        for (int i = 1; i < nodeClusters.size(); i++) {
+            final NodeCluster nextCluster = nodeClusters.get(i);
+            final float xDiff = nextCluster.rect.left - cluster.rect.right - CLUSTER_PADDING;
+            final float yDiff = nextCluster.rect.top - cluster.rect.top;
+            nextCluster.offset(-xDiff, -yDiff);
+            cluster = nextCluster;
+        }
+    }
+
+
+    private void combineSingleNodeCluster(List<NodeCluster> nodeClusters) {
+        NodeCluster firstSingleNodeCluster = null;
+        final Iterator<NodeCluster> iterator = nodeClusters.iterator();
+        while (iterator.hasNext()) {
+            NodeCluster cluster = iterator.next();
+            if (cluster.size() == 1) {
+                if (firstSingleNodeCluster == null) {
+                    firstSingleNodeCluster = cluster;
+                    continue;
+                }
+
+                firstSingleNodeCluster.concat(cluster);
+                iterator.remove();
+            }
+        }
+    }
+
+    private void followEdges(Graph graph, NodeCluster cluster, Node node, List<Node> nodesVisited) {
+        for (Node successor : graph.successorsOf(node)) {
+            if (nodesVisited.contains(successor)) {
+                continue;
+            }
+
+            nodesVisited.add(successor);
+            cluster.add(successor);
+
+            followEdges(graph, cluster, successor, nodesVisited);
+        }
+
+        for (Node predecessor : graph.predecessorsOf(node)) {
+            if (nodesVisited.contains(predecessor)) {
+                continue;
+            }
+
+            nodesVisited.add(predecessor);
+            cluster.add(predecessor);
+
+            followEdges(graph, cluster, predecessor, nodesVisited);
+        }
+    }
+
+    private NodeCluster findClusterOf(List<NodeCluster> clusters, Node node) {
+        for (NodeCluster cluster : clusters) {
+            if (cluster.contains(node)) {
+                return cluster;
+            }
+        }
+
+        return null;
     }
 
     private int findBiggestSize(Graph graph) {
@@ -177,5 +266,51 @@ public class FruchtermanReingoldAlgorithm implements Algorithm {
     @Override
     public void drawEdges(Canvas canvas, Graph graph, Paint linePaint) {
         edgeRenderer.render(canvas, graph, linePaint);
+    }
+
+    @Override
+    public void setEdgeRenderer(EdgeRenderer renderer) {
+        this.edgeRenderer = renderer;
+    }
+
+    private static class NodeCluster {
+        private List<Node> nodes = new ArrayList<>();
+        private RectF rect;
+
+        public void add(Node node) {
+            nodes.add(node);
+
+            if (rect == null) {
+                rect = new RectF(node.getX(), node.getY(), node.getX() + node.getWidth(), node.getY() + node.getHeight());
+            } else {
+                rect.left = Math.min(rect.left, node.getX());
+                rect.top = Math.min(rect.top, node.getY());
+                rect.right = Math.max(rect.right, node.getX() + node.getWidth());
+                rect.bottom = Math.max(rect.bottom, node.getY() + node.getHeight());
+            }
+        }
+
+        public boolean contains(Node node) {
+            return nodes.contains(node);
+        }
+
+        public int size() {
+            return nodes.size();
+        }
+
+        public void concat(NodeCluster cluster) {
+            for (Node node : cluster.nodes) {
+                node.setPos(new Vector(rect.right + CLUSTER_PADDING, rect.top));
+                add(node);
+            }
+        }
+
+        public void offset(float xDiff, float yDiff) {
+            for (Node node : nodes) {
+                node.setPos(node.getPosition().add(xDiff, yDiff));
+            }
+
+            rect.offset(xDiff, yDiff);
+        }
     }
 }

@@ -519,4 +519,9 @@ public class BuchheimWalkerAlgorithm implements Algorithm {
     public void drawEdges(Canvas canvas, Graph graph, Paint linePaint) {
         edgeRenderer.render(canvas, graph, linePaint);
     }
+
+    @Override
+    public void setEdgeRenderer(EdgeRenderer renderer) {
+        this.edgeRenderer = renderer;
+    }
 }

@@ -73,6 +73,17 @@ public abstract class GraphActivity extends AppCompatActivity {
                 }
             }
         });
+
+        addButton.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                if (currentNode != null) {
+                    graph.removeNode(currentNode);
+                    currentNode = null;
+                }
+                return true;
+            }
+        });
     }
 
     private void setupToolbar() {

@@ -93,6 +93,10 @@ public class GraphView extends ZoomLayout {
         graphNodeContainerView.setAdapter(adapter);
     }
 
+    public GraphAdapter getAdapter() {
+        return graphNodeContainerView.getAdapter();
+    }
+
     public void setOnItemClickListener(AdapterView.OnItemClickListener onItemClickListener) {
         graphNodeContainerView.setOnItemClickListener(onItemClickListener);
     }

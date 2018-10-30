@@ -1,3 +1,5 @@
+**Note: This library is in an early stage of development. There will be breaking changes to the public API until the first stable version is released.**
+
 GraphView
 ===========
 
@@ -14,7 +16,7 @@ Download
 
 ```groovy
 dependencies {
-    implementation 'de.blox:graphview:0.4.0'
+    implementation 'de.blox:graphview:0.4.1'
 }
 ```
 Usage

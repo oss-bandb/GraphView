@@ -37,7 +37,7 @@ public abstract class BaseGraphAdapter<VH> implements GraphAdapter<VH> {
 
     @Override
     public void notifySizeChanged() {
-        if (graph != null) {
+        if (graph != null && graph.getNodeCount() > 0) {
             getAlgorithm().run(graph);
         }
     }
@@ -56,6 +56,7 @@ public abstract class BaseGraphAdapter<VH> implements GraphAdapter<VH> {
         Conditions.isNonNull(algorithm, "algorithm can't be null");
 
         mAlgorithm = algorithm;
+        graph.setAsTree(getAlgorithm() instanceof BuchheimWalkerAlgorithm);
     }
 
     @Override
@@ -75,6 +76,8 @@ public abstract class BaseGraphAdapter<VH> implements GraphAdapter<VH> {
         this.graph.addNodeObserver(this);
 
         mDataSetObservable.notifyChanged();
+
+        graph.setAsTree(getAlgorithm() instanceof BuchheimWalkerAlgorithm);
     }
 
     @Override

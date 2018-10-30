@@ -300,7 +300,7 @@ class GraphNodeContainerView extends AdapterView<GraphAdapter> {
     @Override
     protected void dispatchDraw(Canvas canvas) {
         GraphAdapter adapter = getAdapter();
-        if (adapter != null) {
+        if (adapter != null && adapter.getGraph() != null) {
             adapter.getAlgorithm().drawEdges(canvas, adapter.getGraph(), linePaint);
         }
 
