@@ -56,7 +56,9 @@ public abstract class BaseGraphAdapter<VH> implements GraphAdapter<VH> {
         Conditions.isNonNull(algorithm, "algorithm can't be null");
 
         mAlgorithm = algorithm;
-        graph.setAsTree(getAlgorithm() instanceof BuchheimWalkerAlgorithm);
+        if(graph != null) {
+            graph.setAsTree(getAlgorithm() instanceof BuchheimWalkerAlgorithm);
+        }
     }
 
     @Override

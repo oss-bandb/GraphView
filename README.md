@@ -16,7 +16,7 @@ Download
 
 ```groovy
 dependencies {
-    implementation 'de.blox:graphview:0.4.1'
+    implementation 'de.blox:graphview:0.4.2'
 }
 ```
 Usage
