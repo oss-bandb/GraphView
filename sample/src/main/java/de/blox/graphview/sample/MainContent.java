@@ -5,6 +5,7 @@ import java.util.List;
 
 import de.blox.graphview.sample.Algorithms.BuchheimWalkerActivity;
 import de.blox.graphview.sample.Algorithms.FruchtermanReingoldActivity;
+import de.blox.graphview.sample.Algorithms.SugiyamaActivity;
 
 public class MainContent {
 
@@ -14,6 +15,7 @@ public class MainContent {
     static {
         ITEMS.add(new GraphItem("BuchheimWalker", "Algorithm for drawing tree structures", BuchheimWalkerActivity.class));
         ITEMS.add(new GraphItem("FruchtermanReingold", "Directed graph drawing by simulating attraction/repulsion forces", FruchtermanReingoldActivity.class));
+        ITEMS.add(new GraphItem("Sugiyama", "Layerd graph drawing algorithm", SugiyamaActivity.class));
     }
 
     public static class GraphItem {

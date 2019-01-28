@@ -20,6 +20,8 @@
         </activity>
         <activity android:name="de.blox.graphview.sample.Algorithms.BuchheimWalkerActivity">
         </activity>
+        <activity android:name="de.blox.graphview.sample.Algorithms.SugiyamaActivity">
+        </activity>
     </application>
 
 </manifest>

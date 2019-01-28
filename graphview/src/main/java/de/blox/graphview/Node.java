@@ -11,6 +11,8 @@ public class Node {
 
     public Node(Object data) {
         this.data = data;
+        setPos(new Vector());
+        size = new Size(0,0);
     }
 
     public Vector getPosition() {
@@ -27,6 +29,14 @@ public class Node {
 
     public float getY() {
         return pos.getY();
+    }
+
+    public void setX(float x) {
+        this.pos.setX(x);
+    }
+
+    public void setY(float y) {
+        this.pos.setY(y);
     }
 
     public Object getData() {
@@ -47,11 +57,12 @@ public class Node {
 
     @Override
     public String toString() {
-        return "Node{" +
-                "pos=" + pos +
-                ", data=" + data +
-                ", size=" + size +
-                '}';
+//        return "Node{" +
+//                "pos=" + pos +
+//                ", data=" + data +
+//                ", size=" + size +
+//                '}';
+        return data+"";
     }
 
     @Override

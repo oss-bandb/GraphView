@@ -7,15 +7,12 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-/**
- *
- */
 public class Graph {
     private List<Node> nodes = new ArrayList<>();
     private List<Edge> edges = new ArrayList<>();
 
     private List<NodeObserver> observers = new ArrayList<>();
-    private boolean isTree = true;
+    private boolean isTree = false;
 
     /**
      * Add one {@link Node} to the graph without a connection the other nodes.
@@ -95,14 +92,67 @@ public class Graph {
      * @param source
      * @param destination
      */
-    public void addEdge(@NonNull Node source, @NonNull Node destination) {
+    public Edge addEdge(@NonNull Node source, @NonNull Node destination) {
         addNode(source);
         addNode(destination);
 
-        edges.add(new Edge(source, destination));
+        final Edge edge = new Edge(source, destination);
+        edges.add(edge);
 
         for (NodeObserver observer : observers) {
             observer.notifyInvalidated();
+        }
+        return edge;
+    }
+
+    /**
+     * Add one {@link Edge} to the graph.
+     *
+     * @param edge
+     */
+    public void addEdge(@NonNull Edge edge) {
+        if (!this.edges.contains(edge)) {
+            this.edges.add(edge);
+        }
+    }
+
+
+
+    /**
+     * Add one or more {@link Edge Edges} to the graph.
+     *
+     * @param edges
+     */
+    public void addEdges(@NonNull Edge... edges) {
+        for (int i = 0; i < edges.length; i++) {
+            addEdge(edges[i]);
+        }
+    }
+
+
+    public void removeEdge(Edge edge) {
+        edges.remove(edge);
+    }
+
+    /**
+     * Remove {@link Edge Edges} from the graph.
+     *
+     * @param edges
+     */
+    public void removeEdges(@NonNull Edge... edges) {
+        for (int i = 0; i < edges.length; i++) {
+            removeEdge(edges[i]);
+        }
+    }
+
+    public void removeEdge(Node predecessor, Node current) {
+
+        final Iterator<Edge> iterator = getEdges().iterator();
+        while (iterator.hasNext()) {
+            Edge edge = iterator.next();
+            if (edge.getSource().equals(predecessor) && edge.getDestination().equals(current)) {
+                iterator.remove();
+            }
         }
     }
 
@@ -162,6 +212,16 @@ public class Graph {
      */
     public List<Edge> getEdges() {
         return edges;
+    }
+
+    public Edge getEdge(Node source, Node destination) {
+
+        for (Edge edge: getEdges()) {
+            if(edge.getSource().equals(source) && edge.getDestination().equals(destination)) {
+                return edge;
+            }
+        }
+        return null;
     }
 
     /**
@@ -248,6 +308,26 @@ public class Graph {
         }
 
         return null;
+    }
+
+    public List<Edge> getOutEdges(final Node node) {
+        List<Edge> outEdges = new ArrayList<>();
+        for (Edge edge : edges) {
+            if (edge.getSource().equals(node)) {
+                outEdges.add(edge);
+            }
+        }
+        return outEdges;
+    }
+
+    private List<Edge> getInEdges(final Node node) {
+        ArrayList<Edge> inEdges = new ArrayList<>();
+        for (final Edge edge : edges) {
+            if (edge.getDestination().equals(node)) {
+                inEdges.add(edge);
+            }
+        }
+        return inEdges;
     }
 
     // Todo this is a quick fix and should be removed later

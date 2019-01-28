@@ -1,8 +1,8 @@
 package de.blox.graphview;
 
 public class Vector {
-    private final float x;
-    private final float y;
+    private float x;
+    private float y;
 
     public Vector() {
         this(0, 0);
@@ -55,6 +55,14 @@ public class Vector {
 
     public float getY() {
         return y;
+    }
+
+    public void setX(float x) {
+        this.x = x;
+    }
+
+    public void setY(float y) {
+        this.y = y;
     }
 
     @Override

@@ -366,25 +366,10 @@ class GraphNodeContainerView extends AdapterView<GraphAdapter> {
         }
         adapter.notifySizeChanged();
 
-        Size size = fetchViewSize();
+        Size size = adapter.getAlgorithm().getGraphSize();
         setMeasuredDimension(size.getWidth(), size.getHeight());
     }
 
-    private Size fetchViewSize() {
-        int left = Integer.MAX_VALUE;
-        int top = Integer.MAX_VALUE;
-        int right = Integer.MIN_VALUE;
-        int bottom = Integer.MIN_VALUE;
-        for (int i = 0; i < adapter.getCount(); i++) {
-            Node node = adapter.getNode(i);
-            left = (int) Math.min(left, node.getX());
-            top = (int) Math.min(top, node.getY());
-            right = (int) Math.max(right, node.getX() + node.getWidth());
-            bottom = (int) Math.max(bottom, node.getY() + node.getHeight());
-        }
-
-        return new Size(right - left, bottom - top);
-    }
 
     private class GestureListener extends GestureDetector.SimpleOnGestureListener {
         @Override

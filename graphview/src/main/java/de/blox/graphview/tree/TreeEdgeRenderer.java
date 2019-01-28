@@ -6,7 +6,7 @@ import android.graphics.Path;
 
 import java.util.List;
 
-import de.blox.graphview.EdgeRenderer;
+import de.blox.graphview.edgerenderer.EdgeRenderer;
 import de.blox.graphview.Graph;
 import de.blox.graphview.Node;
 

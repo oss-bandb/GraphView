@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 import de.blox.graphview.Algorithm;
-import de.blox.graphview.EdgeRenderer;
+import de.blox.graphview.edgerenderer.EdgeRenderer;
 import de.blox.graphview.Graph;
 import de.blox.graphview.Node;
 import de.blox.graphview.Size;
@@ -32,6 +32,7 @@ public class BuchheimWalkerAlgorithm implements Algorithm {
     private int minNodeWidth = Integer.MAX_VALUE;
     private int maxNodeWidth = Integer.MIN_VALUE;
     private int maxNodeHeight = Integer.MIN_VALUE;
+    private Size size;
 
     public BuchheimWalkerAlgorithm(BuchheimWalkerConfiguration configuration) {
         this.configuration = configuration;
@@ -120,6 +121,23 @@ public class BuchheimWalkerAlgorithm implements Algorithm {
         for (Node w : graph.successorsOf(node)) {
             secondWalk(graph, w, modifier + nodeData.getModifier());
         }
+
+    }
+
+    private void calculateGraphSize(Graph graph) {
+
+        int left = Integer.MAX_VALUE;
+        int top = Integer.MAX_VALUE;
+        int right = Integer.MIN_VALUE;
+        int bottom = Integer.MIN_VALUE;
+        for (Node node : graph.getNodes()) {
+            left = (int) Math.min(left, node.getX());
+            top = (int) Math.min(top, node.getY());
+            right = (int) Math.max(right, node.getX() + node.getWidth());
+            bottom = (int) Math.max(bottom, node.getY() + node.getHeight());
+        }
+
+        size = new Size(right - left, bottom - top);
     }
 
     private boolean isVertical() {
@@ -347,6 +365,8 @@ public class BuchheimWalkerAlgorithm implements Algorithm {
         secondWalk(graph, firstNode, 0);
 
         positionNodes(graph);
+
+        calculateGraphSize(graph);
     }
 
     private void positionNodes(Graph graph) {
@@ -523,5 +543,10 @@ public class BuchheimWalkerAlgorithm implements Algorithm {
     @Override
     public void setEdgeRenderer(EdgeRenderer renderer) {
         this.edgeRenderer = renderer;
+    }
+
+    @Override
+    public Size getGraphSize() {
+        return size;
     }
 }

@@ -13,10 +13,12 @@ import java.util.Random;
 
 import de.blox.graphview.Algorithm;
 import de.blox.graphview.Edge;
-import de.blox.graphview.EdgeRenderer;
 import de.blox.graphview.Graph;
 import de.blox.graphview.Node;
+import de.blox.graphview.Size;
 import de.blox.graphview.Vector;
+import de.blox.graphview.edgerenderer.ArrowEdgeRenderer;
+import de.blox.graphview.edgerenderer.EdgeRenderer;
 
 /**
  *
@@ -27,7 +29,7 @@ public class FruchtermanReingoldAlgorithm implements Algorithm {
     private static final double EPSILON = 0.0001D;
     private static final long SEED = 401678L;
     private final int iterations;
-    private EdgeRenderer edgeRenderer = new EnergyEdgeRenderer();
+    private EdgeRenderer edgeRenderer = new ArrowEdgeRenderer();
     private Map<Node, Vector> disps = new HashMap<>();
     private Random rand = new Random(SEED);
     private int width;
@@ -36,6 +38,7 @@ public class FruchtermanReingoldAlgorithm implements Algorithm {
     private float t;
     private float attraction_k;
     private float repulsion_k;
+    private Size size;
 
     public FruchtermanReingoldAlgorithm() {
         this(DEFAULT_ITERATIONS);
@@ -143,6 +146,8 @@ public class FruchtermanReingoldAlgorithm implements Algorithm {
         }
 
         positionNodes(graph);
+
+        calculateGraphSize(graph);
     }
 
     private void positionNodes(Graph graph) {
@@ -271,6 +276,27 @@ public class FruchtermanReingoldAlgorithm implements Algorithm {
     @Override
     public void setEdgeRenderer(EdgeRenderer renderer) {
         this.edgeRenderer = renderer;
+    }
+
+    @Override
+    public Size getGraphSize() {
+        return size;
+    }
+
+    private void calculateGraphSize(Graph graph) {
+
+        int left = Integer.MAX_VALUE;
+        int top = Integer.MAX_VALUE;
+        int right = Integer.MIN_VALUE;
+        int bottom = Integer.MIN_VALUE;
+        for (Node node : graph.getNodes()) {
+            left = (int) Math.min(left, node.getX());
+            top = (int) Math.min(top, node.getY());
+            right = (int) Math.max(right, node.getX() + node.getWidth());
+            bottom = (int) Math.max(bottom, node.getY() + node.getHeight());
+        }
+
+        size = new Size(right - left, bottom - top);
     }
 
     private static class NodeCluster {
