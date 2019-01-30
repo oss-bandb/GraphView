@@ -20,10 +20,10 @@ public class StraightEdgeRenderer implements EdgeRenderer {
             final Node destination = edge.getDestination();
             final Vector destinationPosition = destination.getPosition();
 
-            canvas.drawLine((float) sourcePosition.getX() + source.getWidth() / 2f,
-                    (float) sourcePosition.getY() + source.getHeight() / 2f,
-                    (float) destinationPosition.getX() + destination.getWidth() / 2f,
-                    (float) destinationPosition.getY() + destination.getHeight() / 2f, paint);
+            canvas.drawLine(sourcePosition.getX() + source.getWidth() / 2f,
+                    sourcePosition.getY() + source.getHeight() / 2f,
+                    destinationPosition.getX() + destination.getWidth() / 2f,
+                    destinationPosition.getY() + destination.getHeight() / 2f, paint);
         }
     }
 }

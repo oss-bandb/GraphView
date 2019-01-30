@@ -12,7 +12,7 @@ public class Node {
     public Node(Object data) {
         this.data = data;
         setPos(new Vector());
-        size = new Size(0,0);
+        size = new Size(0, 0);
     }
 
     public Vector getPosition() {
@@ -57,12 +57,11 @@ public class Node {
 
     @Override
     public String toString() {
-//        return "Node{" +
-//                "pos=" + pos +
-//                ", data=" + data +
-//                ", size=" + size +
-//                '}';
-        return data+"";
+        return "Node{" +
+                "pos=" + pos +
+                ", data=" + data +
+                ", size=" + size +
+                '}';
     }
 
     @Override

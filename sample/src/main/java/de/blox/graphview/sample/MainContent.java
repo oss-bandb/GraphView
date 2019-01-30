@@ -15,7 +15,7 @@ public class MainContent {
     static {
         ITEMS.add(new GraphItem("BuchheimWalker", "Algorithm for drawing tree structures", BuchheimWalkerActivity.class));
         ITEMS.add(new GraphItem("FruchtermanReingold", "Directed graph drawing by simulating attraction/repulsion forces", FruchtermanReingoldActivity.class));
-        ITEMS.add(new GraphItem("Sugiyama", "Layerd graph drawing algorithm", SugiyamaActivity.class));
+        ITEMS.add(new GraphItem("Sugiyama et al.", "Layered graph drawing algorithm where the hierarchical structure of the graph is used to advantage.", SugiyamaActivity.class));
     }
 
     public static class GraphItem {

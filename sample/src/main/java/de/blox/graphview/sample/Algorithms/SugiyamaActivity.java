@@ -13,7 +13,6 @@ public class SugiyamaActivity extends GraphActivity {
     public Graph createGraph() {
         final Graph graph = new Graph();
         if (false) {
-
             final Node a = new Node(getNodeText());
             final Node b = new Node(getNodeText());
             final Node c = new Node(getNodeText());

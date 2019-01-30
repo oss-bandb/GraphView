@@ -2,6 +2,7 @@ package de.blox.graphview.layered;
 
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.graphics.Path;
 
 import java.util.List;
 import java.util.Map;
@@ -24,6 +25,7 @@ public class SugiyamaEdgeRenderer extends ArrowEdgeRenderer {
     public void render(Canvas canvas, Graph graph, Paint paint) {
         Paint trianglePaint = new Paint(paint);
         trianglePaint.setStyle(Paint.Style.FILL);
+        Path path = new Path();
 
         for (Edge edge : graph.getEdges()) {
             final Node source = edge.getSource();
@@ -47,15 +49,16 @@ public class SugiyamaEdgeRenderer extends ArrowEdgeRenderer {
             } else {
                 // draw bend points
                 final List<Float> bendPoints = edgeData.get(edge).bendPoints;
-                float[] floatArray = new float[bendPoints.size()];
-                int i = 0;
+                final int size = bendPoints.size();
 
-                for (Float f : bendPoints) {
-                    floatArray[i++] = (f != null ? f : Float.NaN);
+                path.reset();
+                path.moveTo(bendPoints.get(0), bendPoints.get(1));
+
+                for (int i = 3; i < size; i = i + 2) {
+                    path.lineTo(bendPoints.get(i - 1), bendPoints.get(i));
                 }
-
-                canvas.drawLines(floatArray, paint);
-                clippedLine = clipLine(floatArray[i - 4], floatArray[i - 3], floatArray[i - 2], floatArray[i - 1], destination);
+                canvas.drawPath(path, paint);
+                clippedLine = clipLine(bendPoints.get(size - 4), bendPoints.get(size - 3), bendPoints.get(size - 2), bendPoints.get(size - 1), destination);
             }
             drawTriangle(canvas, trianglePaint, clippedLine[0], clippedLine[1], clippedLine[2], clippedLine[3]);
         }
