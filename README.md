@@ -9,16 +9,26 @@ Android GraphView is used to display data in graph structures.
 
 Overview
 ========
-The library is designed to support different algorithms. Currently, only the algorithms from Walker (with the runtime improvements from Buchheim) and Fruchterman&Reingold (for small graphs) have been implemented.
+The library is designed to support different graph layouts.
 
 Download
 ========
 
 ```groovy
 dependencies {
-    implementation 'de.blox:graphview:0.4.2'
+    implementation 'de.blox:graphview:0.5.0'
 }
 ```
+Layouts
+======
+### Tree
+Uses Walker's algorithm with Buchheim's runtime improvements (`BuchheimWalkerAlgorithm` class). Supports different orientations. All you have to do is using the `BuchheimWalkerConfiguration.Builder.setOrientation(int)` with either `ORIENTATION_LEFT_RIGHT`, `ORIENTATION_RIGHT_LEFT`, `ORIENTATION_TOP_BOTTOM` and
+`ORIENTATION_BOTTOM_TOP` (default). Furthermore parameters like sibling-, level-, subtree separation can be set.
+### Directed graph
+Directed graph drawing by simulating attraction/repulsion forces. For this the algorithm by Fruchterman and Reingold (`FruchtermanReingoldAlgorithm` class) was implemented (currently works only for small graphs).
+### Layered graph
+Algorithm from Sugiyama et al. for drawing multilayer graphs, taking advantage of the hierarchical structure of the graph (`SugiyamaAlgorithm` class). You can also set the parameters for node and level separation using the `SugiyamaConfiguration.Builder`.
+
 Usage
 ======
 
@@ -166,10 +176,13 @@ Examples
 #### Directed Graph
 ![alt Example](image/Graph.png "Graph Example")
 
+#### Layered Graph
+![alt Example](image/LayeredGraph.png "Layered Graph Example")
+
 License
 =======
 
-    Copyright 2018 Team-Blox
+    Copyright 2019 Team-Blox
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
