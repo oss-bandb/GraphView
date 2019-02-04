@@ -17,10 +17,10 @@ import java.util.Set;
 
 import de.blox.graphview.Algorithm;
 import de.blox.graphview.Edge;
-import de.blox.graphview.edgerenderer.EdgeRenderer;
 import de.blox.graphview.Graph;
 import de.blox.graphview.Node;
 import de.blox.graphview.Size;
+import de.blox.graphview.edgerenderer.EdgeRenderer;
 
 public class SugiyamaAlgorithm implements Algorithm {
     private final SugiyamaConfiguration configuration;
@@ -35,7 +35,7 @@ public class SugiyamaAlgorithm implements Algorithm {
 
     public SugiyamaAlgorithm(SugiyamaConfiguration configuration) {
         this.configuration = configuration;
-        edgeRenderer = new SugiyamaEdgeRenderer(edgeData);
+        edgeRenderer = new SugiyamaEdgeRenderer(nodeData, edgeData);
     }
 
     @Override
@@ -106,7 +106,7 @@ public class SugiyamaAlgorithm implements Algorithm {
             if (stack.contains(target)) {
                 graph.removeEdge(edge);
                 graph.addEdge(target, node);
-                nodeData.get(node).reversed = true;
+                nodeData.get(node).reversed.add(target);
             } else {
                 dfs(target);
             }
@@ -149,7 +149,7 @@ public class SugiyamaAlgorithm implements Algorithm {
                     dummyNodeData.layer = indexNextLayer;
                     nextLayer.add(dummy);
                     nodeData.put(dummy, dummyNodeData);
-                    dummy.setSize(edge.getSource().getWidth(), 0);
+                    dummy.setSize(edge.getSource().getWidth(), 0); // TODO: calc avg layer height
                     final Edge dummyEdge1 = this.graph.addEdge(edge.getSource(), dummy);
                     final Edge dummyEdge2 = this.graph.addEdge(dummy, edge.getDestination());
                     edgeData.put(dummyEdge1, new SugiyamaEdgeData());
@@ -366,7 +366,6 @@ public class SugiyamaAlgorithm implements Algorithm {
             }
         }
         balance(x, blockWidth);
-        System.out.println("bla");
     }
 
     private void balance(List<HashMap<Node, Float>> x, List<HashMap<Node, Float>> blockWidth) {
@@ -832,13 +831,13 @@ public class SugiyamaAlgorithm implements Algorithm {
     private void restoreCycle() {
         for (Node n : graph.getNodes()) {
             if (nodeData.get(n).isReversed()) {
-                final Iterator<Edge> iterator = graph.getEdges().iterator();
-                while (iterator.hasNext()) {
-                    final Edge edge = iterator.next();
-                    if (edge.getDestination().equals(n) || edge.getSource().equals(n)) {
-                        graph.addEdge(edge.getDestination(), edge.getSource());
-                    }
-                    iterator.remove();
+                for (Node target : nodeData.get(n).reversed) {
+                    final List<Float> bendPoints = edgeData.get(graph.getEdge(target, n)).bendPoints;
+                    graph.removeEdge(target, n);
+                    final Edge edge = graph.addEdge(n, target);
+                    final SugiyamaEdgeData edgeData = new SugiyamaEdgeData();
+                    edgeData.bendPoints = bendPoints;
+                    this.edgeData.put(edge, edgeData);
                 }
             }
         }

@@ -15,9 +15,11 @@ import de.blox.graphview.edgerenderer.ArrowEdgeRenderer;
 
 public class SugiyamaEdgeRenderer extends ArrowEdgeRenderer {
 
+    private Map<Node, SugiyamaNodeData> nodeData;
     private Map<Edge, SugiyamaEdgeData> edgeData;
 
-    SugiyamaEdgeRenderer(Map<Edge, SugiyamaEdgeData> edgeData) {
+    SugiyamaEdgeRenderer(Map<Node, SugiyamaNodeData> nodeData, Map<Edge, SugiyamaEdgeData> edgeData) {
+        this.nodeData = nodeData;
         this.edgeData = edgeData;
     }
 
@@ -34,19 +36,7 @@ public class SugiyamaEdgeRenderer extends ArrowEdgeRenderer {
             final Vector destinationPosition = destination.getPosition();
             float[] clippedLine;
 
-            if (edgeData.get(edge).bendPoints.isEmpty()) {
-                final float startX = sourcePosition.getX() + source.getWidth() / 2f;
-                final float startY = sourcePosition.getY() + source.getHeight() / 2f;
-                float stopX = destinationPosition.getX() + destination.getWidth() / 2f;
-                float stopY = destinationPosition.getY() + destination.getHeight() / 2f;
-
-                clippedLine = clipLine(startX, startY, stopX, stopY, destination);
-
-                canvas.drawLine(clippedLine[0],
-                        clippedLine[1],
-                        clippedLine[2],
-                        clippedLine[3], paint);
-            } else {
+            if (edgeData.containsKey(edge) && !edgeData.get(edge).bendPoints.isEmpty()) {
                 // draw bend points
                 final List<Float> bendPoints = edgeData.get(edge).bendPoints;
                 final int size = bendPoints.size();
@@ -58,7 +48,23 @@ public class SugiyamaEdgeRenderer extends ArrowEdgeRenderer {
                     path.lineTo(bendPoints.get(i - 1), bendPoints.get(i));
                 }
                 canvas.drawPath(path, paint);
-                clippedLine = clipLine(bendPoints.get(size - 4), bendPoints.get(size - 3), bendPoints.get(size - 2), bendPoints.get(size - 1), destination);
+                if (nodeData.get(source).isReversed()) {
+                    clippedLine = clipLine(bendPoints.get(2), bendPoints.get(3), bendPoints.get(0), bendPoints.get(1), destination);
+                } else {
+                    clippedLine = clipLine(bendPoints.get(size - 4), bendPoints.get(size - 3), bendPoints.get(size - 2), bendPoints.get(size - 1), destination);
+                }
+            } else {
+                final float startX = sourcePosition.getX() + source.getWidth() / 2f;
+                final float startY = sourcePosition.getY() + source.getHeight() / 2f;
+                float stopX = destinationPosition.getX() + destination.getWidth() / 2f;
+                float stopY = destinationPosition.getY() + destination.getHeight() / 2f;
+
+                clippedLine = clipLine(startX, startY, stopX, stopY, destination);
+
+                canvas.drawLine(clippedLine[0],
+                        clippedLine[1],
+                        clippedLine[2],
+                        clippedLine[3], paint);
             }
             drawTriangle(canvas, trianglePaint, clippedLine[0], clippedLine[1], clippedLine[2], clippedLine[3]);
         }
