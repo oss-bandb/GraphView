@@ -4,7 +4,6 @@ import de.blox.graphview.Graph;
 import de.blox.graphview.GraphAdapter;
 import de.blox.graphview.Node;
 import de.blox.graphview.layered.SugiyamaAlgorithm;
-import de.blox.graphview.layered.SugiyamaConfiguration;
 import de.blox.graphview.sample.GraphActivity;
 
 public class SugiyamaActivity extends GraphActivity {
@@ -75,7 +74,6 @@ public class SugiyamaActivity extends GraphActivity {
 
     @Override
     public void setAlgorithm(GraphAdapter adapter) {
-        final SugiyamaConfiguration configuration = new SugiyamaConfiguration(new SugiyamaConfiguration.Builder().setLevelSeparation(100).setNodeSeparation(100));
-        adapter.setAlgorithm(new SugiyamaAlgorithm(configuration));
+        adapter.setAlgorithm(new SugiyamaAlgorithm());
     }
 }

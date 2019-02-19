@@ -24,6 +24,7 @@ public class SugiyamaConfiguration {
         nodeSeparation = builder.nodeSeparation;
     }
 
+    //TODO: enhance builder-pattern
     public static class Builder {
 
         private int levelSeparation = Y_SEPARATION;

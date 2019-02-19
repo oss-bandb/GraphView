@@ -33,6 +33,10 @@ public class SugiyamaAlgorithm implements Algorithm {
     private EdgeRenderer edgeRenderer;
     private Size size = new Size(0, 0);
 
+    public SugiyamaAlgorithm() {
+       this(new SugiyamaConfiguration(new SugiyamaConfiguration.Builder()));
+    }
+
     public SugiyamaAlgorithm(SugiyamaConfiguration configuration) {
         this.configuration = configuration;
         edgeRenderer = new SugiyamaEdgeRenderer(nodeData, edgeData);
