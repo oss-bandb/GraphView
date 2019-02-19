@@ -1,37 +1,25 @@
 package de.blox.graphview;
 
-import android.content.Context;
 import android.database.DataSetObservable;
 import android.database.DataSetObserver;
-import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import de.blox.graphview.tree.BuchheimWalkerAlgorithm;
 
-/**
- *
- */
-
-public abstract class BaseGraphAdapter<VH> implements GraphAdapter<VH> {
-    private final int mLayoutRes;
+public abstract class BaseGraphAdapter<VH extends ViewHolder> implements GraphAdapter<VH> {
     private Graph graph;
 
     private Algorithm mAlgorithm;
 
-    private LayoutInflater mLayoutInflater;
-
     private DataSetObservable mDataSetObservable = new DataSetObservable();
 
-    public BaseGraphAdapter(@NonNull Context context, @LayoutRes int layoutRes) {
-        mLayoutInflater = LayoutInflater.from(context);
-        mLayoutRes = layoutRes;
+    public BaseGraphAdapter() {
+
     }
 
-    public BaseGraphAdapter(@NonNull Context context, @LayoutRes int layoutRes, @NonNull Graph graph) {
-        this(context, layoutRes);
+    public BaseGraphAdapter(@NonNull Graph graph) {
         setGraph(graph);
     }
 
@@ -148,12 +136,12 @@ public abstract class BaseGraphAdapter<VH> implements GraphAdapter<VH> {
         VH viewHolder;
 
         if (convertView == null) {
-            view = mLayoutInflater.inflate(mLayoutRes, parent, false);
-            viewHolder = onCreateViewHolder(view);
+            viewHolder = onCreateViewHolder(parent, getItemViewType(position));
+            view = viewHolder.itemView;
             view.setTag(viewHolder);
         } else {
-            view = convertView;
-            viewHolder = (VH) view.getTag();
+            viewHolder = (VH) convertView.getTag();
+            view = viewHolder.itemView;
         }
 
         Node node = getNode(position);
@@ -176,5 +164,4 @@ public abstract class BaseGraphAdapter<VH> implements GraphAdapter<VH> {
     public boolean isEmpty() {
         return false;
     }
-
 }

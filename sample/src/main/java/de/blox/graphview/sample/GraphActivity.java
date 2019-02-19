@@ -7,8 +7,9 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.AdapterView;
+import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -17,6 +18,7 @@ import de.blox.graphview.Graph;
 import de.blox.graphview.GraphAdapter;
 import de.blox.graphview.GraphView;
 import de.blox.graphview.Node;
+import de.blox.graphview.ViewHolder;
 
 public abstract class GraphActivity extends AppCompatActivity {
     private int nodeCount = 1;
@@ -37,52 +39,54 @@ public abstract class GraphActivity extends AppCompatActivity {
     private void setupAdapter(Graph graph) {
         final GraphView graphView = findViewById(R.id.graph);
 
-        adapter = new BaseGraphAdapter<ViewHolder>(this, R.layout.node, graph) {
+        adapter = new BaseGraphAdapter<ViewHolder>(graph) {
+
             @NonNull
             @Override
-            public ViewHolder onCreateViewHolder(View view) {
-                return new ViewHolder(view);
+            public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+                final View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.node, parent, false);
+                return new SimpleViewHolder(view);
             }
 
             @Override
             public void onBindViewHolder(ViewHolder viewHolder, Object data, int position) {
-                viewHolder.textView.setText(data.toString());
+                ((SimpleViewHolder)viewHolder).textView.setText(data.toString());
+            }
+
+            class SimpleViewHolder extends ViewHolder {
+                TextView textView;
+
+                SimpleViewHolder(View itemView) {
+                    super(itemView);
+                    textView = itemView.findViewById(R.id.textView);
+                }
             }
         };
 
         setAlgorithm(adapter);
 
         graphView.setAdapter(adapter);
-        graphView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                currentNode = adapter.getNode(position);
-                Snackbar.make(graphView, "Clicked on " + currentNode.getData().toString(), Toast.LENGTH_SHORT).show();
-            }
+        graphView.setOnItemClickListener((parent, view, position, id) -> {
+            currentNode = adapter.getNode(position);
+            Snackbar.make(graphView, "Clicked on " + currentNode.getData().toString(), Toast.LENGTH_SHORT).show();
         });
     }
 
     private void setupFab(final Graph graph) {
         FloatingActionButton addButton = findViewById(R.id.addNode);
-        addButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (currentNode != null) {
-                    final Node newNode = new Node(getNodeText());
-                    graph.addEdge(currentNode, newNode);
-                }
+        addButton.setOnClickListener(v -> {
+            if (currentNode != null) {
+                final Node newNode = new Node(getNodeText());
+                graph.addEdge(currentNode, newNode);
             }
         });
 
-        addButton.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                if (currentNode != null) {
-                    graph.removeNode(currentNode);
-                    currentNode = null;
-                }
-                return true;
+        addButton.setOnLongClickListener(v -> {
+            if (currentNode != null) {
+                graph.removeNode(currentNode);
+                currentNode = null;
             }
+            return true;
         });
     }
 
@@ -104,15 +108,6 @@ public abstract class GraphActivity extends AppCompatActivity {
 
     public abstract Graph createGraph();
     public abstract void setAlgorithm(GraphAdapter adapter);
-
-    private class ViewHolder {
-        TextView textView;
-
-        ViewHolder(View view) {
-            textView = view.findViewById(R.id.textView);
-        }
-    }
-
     protected String getNodeText() {
         return "Node " + nodeCount++;
     }

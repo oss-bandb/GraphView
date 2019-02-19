@@ -1,7 +1,7 @@
 package de.blox.graphview;
 
 import android.support.annotation.NonNull;
-import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Adapter;
 
 import de.blox.graphview.tree.BuchheimWalkerAlgorithm;
@@ -9,7 +9,7 @@ import de.blox.graphview.tree.BuchheimWalkerAlgorithm;
 /**
  *
  */
-public interface GraphAdapter<VH> extends Adapter, NodeObserver {
+public interface GraphAdapter<VH extends ViewHolder> extends Adapter, NodeObserver {
 
     void notifySizeChanged();
 
@@ -52,7 +52,7 @@ public interface GraphAdapter<VH> extends Adapter, NodeObserver {
     Vector getScreenPosition(int position);
 
     @NonNull
-    VH onCreateViewHolder(View view);
+    VH onCreateViewHolder(ViewGroup parent, int viewType);
 
     void onBindViewHolder(VH viewHolder, Object data, int position);
 
