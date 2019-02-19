@@ -16,7 +16,7 @@ Download
 
 ```groovy
 dependencies {
-    implementation 'de.blox:graphview:0.5.0'
+    implementation 'de.blox:graphview:0.6.0'
 }
 ```
 Layouts
@@ -112,16 +112,18 @@ public class MainActivity extends AppCompatActivity {
         graph.addEdge(node11, node12);
 
         // you can set the graph via the constructor or use the adapter.setGraph(Graph) method
-        final BaseGraphAdapter<ViewHolder> adapter = new BaseGraphAdapter<ViewHolder>(this, R.layout.node, graph) {
+        final BaseGraphAdapter<ViewHolder> adapter = new BaseGraphAdapter<ViewHolder>(graph) {
+        
             @NonNull
             @Override
-            public ViewHolder onCreateViewHolder(View view) {
-                return new ViewHolder(view);
+            public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+                final View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.node, parent, false);
+                return new SimpleViewHolder(view);
             }
 
             @Override
             public void onBindViewHolder(ViewHolder viewHolder, Object data, int position) {
-                viewHolder.mTextView.setText(data.toString());
+                ((SimpleViewHolder)viewHolder).textView.setText(data.toString());
             }
         };
         graphView.setAdapter(adapter);
@@ -142,14 +144,16 @@ public class MainActivity extends AppCompatActivity {
 }
 ```
 
-ViewHolder class:
+Your ViewHolder class should extend from ViewHolder:
 ```java
-    private class ViewHolder {
-        TextView mTextView;
-        ViewHolder(View view) {
-            mTextView = view.findViewById(R.id.textView);
-        }
+class SimpleViewHolder extends ViewHolder {
+    TextView textView;
+
+    SimpleViewHolder(View itemView) {
+        super(itemView);
+        textView = itemView.findViewById(R.id.textView);
     }
+}
 ```
 
 Customization
