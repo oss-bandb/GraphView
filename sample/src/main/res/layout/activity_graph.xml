@@ -26,8 +26,7 @@
         android:layout_height="match_parent"
         android:layout_marginTop="?attr/actionBarSize"
         app:lineColor="@android:color/holo_blue_dark"
-        app:maxZoom="5.5"
-        app:hasClickableChildren="true"/>
+        app:maxZoom="5.5"/>
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/addNode"

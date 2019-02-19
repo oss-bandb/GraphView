@@ -26,7 +26,9 @@ public class GraphView extends ZoomLayout {
         super(context, attrs, defStyleAttr);
 
         graphNodeContainerView = new GraphNodeContainerView(context, attrs, defStyleAttr);
-        addView(graphNodeContainerView, -1, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        super.addView(graphNodeContainerView, -1, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+
+        setHasClickableChildren(true);
     }
 
     @Override
