@@ -31,7 +31,7 @@ public class SugiyamaAlgorithm implements Algorithm {
     private List<List<Node>> layers = new ArrayList<>();
     private Graph graph;
     private EdgeRenderer edgeRenderer;
-    private Size size;
+    private Size size = new Size(0, 0);
 
     public SugiyamaAlgorithm(SugiyamaConfiguration configuration) {
         this.configuration = configuration;

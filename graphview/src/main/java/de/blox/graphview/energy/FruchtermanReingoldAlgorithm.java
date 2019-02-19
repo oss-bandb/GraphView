@@ -38,7 +38,7 @@ public class FruchtermanReingoldAlgorithm implements Algorithm {
     private float t;
     private float attraction_k;
     private float repulsion_k;
-    private Size size;
+    private Size size = new Size(0, 0);
 
     public FruchtermanReingoldAlgorithm() {
         this(DEFAULT_ITERATIONS);

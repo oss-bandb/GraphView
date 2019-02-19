@@ -32,7 +32,7 @@ public class BuchheimWalkerAlgorithm implements Algorithm {
     private int minNodeWidth = Integer.MAX_VALUE;
     private int maxNodeWidth = Integer.MIN_VALUE;
     private int maxNodeHeight = Integer.MIN_VALUE;
-    private Size size;
+    private Size size = new Size(0, 0);
 
     public BuchheimWalkerAlgorithm(BuchheimWalkerConfiguration configuration) {
         this.configuration = configuration;
@@ -511,7 +511,7 @@ public class BuchheimWalkerAlgorithm implements Algorithm {
             }
         };
 
-        if(descending) {
+        if (descending) {
             comparator = Collections.reverseOrder(comparator);
         }
 
@@ -524,10 +524,10 @@ public class BuchheimWalkerAlgorithm implements Algorithm {
         List<Node> nodeList = new ArrayList<>(nodes);
 
         Iterator<Node> iterator = nodeList.iterator();
-        while(iterator.hasNext()) {
+        while (iterator.hasNext()) {
             Node node = iterator.next();
             int depth = getNodeData(node).getDepth();
-            if(depth != level) {
+            if (depth != level) {
                 iterator.remove();
             }
         }
