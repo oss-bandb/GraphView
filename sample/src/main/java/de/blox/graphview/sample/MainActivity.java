@@ -61,12 +61,7 @@ public class MainActivity extends AppCompatActivity {
             holder.title.setText(graphItem.title);
             holder.description.setText(graphItem.description);
 
-            holder.itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    startActivity(new Intent(MainActivity.this, graphItem.clazz));
-                }
-            });
+            holder.itemView.setOnClickListener(v -> startActivity(new Intent(MainActivity.this, graphItem.clazz)));
         }
 
         @Override

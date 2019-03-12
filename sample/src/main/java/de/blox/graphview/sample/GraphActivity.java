@@ -38,8 +38,7 @@ public abstract class GraphActivity extends AppCompatActivity {
 
     private void setupAdapter(Graph graph) {
         final GraphView graphView = findViewById(R.id.graph);
-
-        adapter = new BaseGraphAdapter<ViewHolder>(graph) {
+        adapter = new BaseGraphAdapter<ViewHolder>() {
 
             @NonNull
             @Override
@@ -63,6 +62,7 @@ public abstract class GraphActivity extends AppCompatActivity {
             }
         };
 
+        adapter.setGraph(graph);
         setAlgorithm(adapter);
 
         graphView.setAdapter(adapter);

@@ -45,7 +45,6 @@ public class BuchheimWalkerActivity extends GraphActivity {
                 return super.onOptionsItemSelected(item);
         }
         adapter.setAlgorithm(new BuchheimWalkerAlgorithm(builder.build()));
-        adapter.notifyInvalidated();
         return true;
     }
 
