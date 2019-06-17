@@ -32,7 +32,7 @@ class GraphView @JvmOverloads constructor(
         setHasClickableChildren(true)
     }
 
-    var lineThickness: Float
+    var lineThickness: Int
         get() = graphNodeContainerView.lineThickness
         set(@Px lineThickness) {
             graphNodeContainerView.lineThickness = lineThickness

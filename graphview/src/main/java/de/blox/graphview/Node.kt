@@ -3,7 +3,7 @@ package de.blox.graphview
 import de.blox.graphview.util.Size
 import de.blox.graphview.util.VectorF
 
-data class Node(val data: Any) {
+data class Node(var data: Any) {
     val position: VectorF = VectorF()
     val size: Size = Size()
 

@@ -9,7 +9,6 @@ import android.util.AttributeSet
 import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.View
-import android.view.ViewGroup
 import android.widget.AdapterView
 
 internal class GraphNodeContainerView @JvmOverloads constructor(
@@ -21,7 +20,7 @@ internal class GraphNodeContainerView @JvmOverloads constructor(
 
     init {
         linePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-            strokeWidth = lineThickness
+            strokeWidth = lineThickness.toFloat()
             color = lineColor
             style = Paint.Style.STROKE
             strokeJoin = Paint.Join.ROUND    // set the join to round you want
@@ -31,9 +30,9 @@ internal class GraphNodeContainerView @JvmOverloads constructor(
         attrs?.let { initAttrs(context, it) }
     }
 
-    var lineThickness: Float = DEFAULT_LINE_THICKNESS
+    var lineThickness: Int = DEFAULT_LINE_THICKNESS
         set(@Px value) {
-            linePaint.strokeWidth = value
+            linePaint.strokeWidth = value.toFloat()
             field = value
             invalidate()
         }
@@ -67,7 +66,8 @@ internal class GraphNodeContainerView @JvmOverloads constructor(
     private fun initAttrs(context: Context, attrs: AttributeSet) {
         val a = context.theme.obtainStyledAttributes(attrs, R.styleable.GraphView, 0, 0)
 
-        lineThickness = a.getDimension(R.styleable.GraphView_lineThickness, DEFAULT_LINE_THICKNESS)
+        lineThickness =
+            a.getDimensionPixelSize(R.styleable.GraphView_lineThickness, DEFAULT_LINE_THICKNESS)
         lineColor = a.getColor(R.styleable.GraphView_lineColor, DEFAULT_LINE_COLOR)
         isUsingMaxSize = a.getBoolean(R.styleable.GraphView_useMaxSize, DEFAULT_USE_MAX_SIZE)
 
@@ -105,11 +105,11 @@ internal class GraphNodeContainerView @JvmOverloads constructor(
     }
 
     private fun addAndMeasureChild(child: View) {
-        var params: ViewGroup.LayoutParams? = child.layoutParams
+        var params: LayoutParams? = child.layoutParams
         if (params == null) {
-            params = ViewGroup.LayoutParams(
-                ViewGroup.LayoutParams.WRAP_CONTENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT
+            params = LayoutParams(
+                LayoutParams.WRAP_CONTENT,
+                LayoutParams.WRAP_CONTENT
             )
         }
 
@@ -118,11 +118,11 @@ internal class GraphNodeContainerView @JvmOverloads constructor(
         var heightSpec = makeMeasureSpec(params.height)
 
         if (isUsingMaxSize) {
-            widthSpec = View.MeasureSpec.makeMeasureSpec(
-                maxChildWidth, View.MeasureSpec.EXACTLY
+            widthSpec = MeasureSpec.makeMeasureSpec(
+                maxChildWidth, MeasureSpec.EXACTLY
             )
-            heightSpec = View.MeasureSpec.makeMeasureSpec(
-                maxChildHeight, View.MeasureSpec.EXACTLY
+            heightSpec = MeasureSpec.makeMeasureSpec(
+                maxChildHeight, MeasureSpec.EXACTLY
             )
         }
 
@@ -213,11 +213,11 @@ internal class GraphNodeContainerView @JvmOverloads constructor(
         for (i in 0 until adapter.count) {
             val child = adapter.getView(i, null, this)
 
-            var params: ViewGroup.LayoutParams? = child.layoutParams
+            var params: LayoutParams? = child.layoutParams
             if (params == null) {
-                params = ViewGroup.LayoutParams(
-                    ViewGroup.LayoutParams.WRAP_CONTENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT
+                params = LayoutParams(
+                    LayoutParams.WRAP_CONTENT,
+                    LayoutParams.WRAP_CONTENT
                 )
             }
             addViewInLayout(child, -1, params, true)
@@ -247,19 +247,19 @@ internal class GraphNodeContainerView @JvmOverloads constructor(
             for (i in 0 until adapter.count) {
                 val child = adapter.getView(i, null, this)
 
-                var params: ViewGroup.LayoutParams? = child.layoutParams
+                var params: LayoutParams? = child.layoutParams
                 if (params == null) {
-                    params = ViewGroup.LayoutParams(
-                        ViewGroup.LayoutParams.WRAP_CONTENT,
-                        ViewGroup.LayoutParams.WRAP_CONTENT
+                    params = LayoutParams(
+                        LayoutParams.WRAP_CONTENT,
+                        LayoutParams.WRAP_CONTENT
                     )
                 }
                 addViewInLayout(child, -1, params, true)
 
                 val widthSpec =
-                    View.MeasureSpec.makeMeasureSpec(maxChildWidth, View.MeasureSpec.EXACTLY)
+                    MeasureSpec.makeMeasureSpec(maxChildWidth, MeasureSpec.EXACTLY)
                 val heightSpec =
-                    View.MeasureSpec.makeMeasureSpec(maxChildHeight, View.MeasureSpec.EXACTLY)
+                    MeasureSpec.makeMeasureSpec(maxChildHeight, MeasureSpec.EXACTLY)
                 child.measure(widthSpec, heightSpec)
 
                 val node = adapter.getNode(i)
@@ -325,7 +325,7 @@ internal class GraphNodeContainerView @JvmOverloads constructor(
     companion object {
 
         const val DEFAULT_USE_MAX_SIZE = false
-        const val DEFAULT_LINE_THICKNESS = 5f
+        const val DEFAULT_LINE_THICKNESS = 5
         const val DEFAULT_LINE_COLOR = Color.BLACK
         const val INVALID_INDEX = -1
 

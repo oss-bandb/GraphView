@@ -9,7 +9,7 @@ internal class SugiyamaNodeData {
     var layer = -1
 
     val isReversed: Boolean
-        get() = !reversed.isEmpty()
+        get() = reversed.isNotEmpty()
 
     override fun toString(): String {
         return "SugiyamaNodeData{" +

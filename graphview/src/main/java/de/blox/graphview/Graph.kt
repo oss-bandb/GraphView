@@ -48,18 +48,16 @@ class Graph {
     fun removeNodes(vararg nodes: Node) = nodes.forEach { removeNode(it) }
 
     fun addEdge(source: Node, destination: Node): Edge {
-        addNode(source)
-        addNode(destination)
-
         val edge = Edge(source, destination)
-        _edges.add(edge)
-
-        notifyGraphObserver()
+        addEdge(edge)
 
         return edge
     }
 
     fun addEdge(edge: Edge) {
+        addNode(edge.source)
+        addNode(edge.destination)
+
         if (edge !in _edges) {
             _edges.add(edge)
             notifyGraphObserver()
@@ -119,7 +117,7 @@ class Graph {
 
     fun getOutEdges(node: Node): List<Edge> = _edges.filter { it.source == node }
 
-    private fun getInEdges(node: Node): List<Edge> = _edges.filter { it.destination == node }
+    fun getInEdges(node: Node): List<Edge> = _edges.filter { it.destination == node }
 
     // Todo this is a quick fix and should be removed later
     fun setAsTree(isTree: Boolean) {
