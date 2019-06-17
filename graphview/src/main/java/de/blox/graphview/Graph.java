@@ -93,15 +93,9 @@ public class Graph {
      * @param destination
      */
     public Edge addEdge(@NonNull Node source, @NonNull Node destination) {
-        addNode(source);
-        addNode(destination);
-
         final Edge edge = new Edge(source, destination);
-        edges.add(edge);
+        addEdge(edge);
 
-        for (NodeObserver observer : observers) {
-            observer.notifyInvalidated();
-        }
         return edge;
     }
 
@@ -111,11 +105,17 @@ public class Graph {
      * @param edge
      */
     public void addEdge(@NonNull Edge edge) {
+        addNode(edge.getSource());
+        addNode(edge.getDestination());
+
         if (!this.edges.contains(edge)) {
             this.edges.add(edge);
+
+            for (NodeObserver observer : observers) {
+                observer.notifyInvalidated();
+            }
         }
     }
-
 
 
     /**
@@ -216,8 +216,8 @@ public class Graph {
 
     public Edge getEdge(Node source, Node destination) {
 
-        for (Edge edge: getEdges()) {
-            if(edge.getSource().equals(source) && edge.getDestination().equals(destination)) {
+        for (Edge edge : getEdges()) {
+            if (edge.getSource().equals(source) && edge.getDestination().equals(destination)) {
                 return edge;
             }
         }

@@ -27,12 +27,12 @@ public class Node {
         return pos.getX();
     }
 
-    public float getY() {
-        return pos.getY();
-    }
-
     public void setX(float x) {
         this.pos.setX(x);
+    }
+
+    public float getY() {
+        return pos.getY();
     }
 
     public void setY(float y) {
@@ -41,6 +41,10 @@ public class Node {
 
     public Object getData() {
         return data;
+    }
+
+    public void setData(Object data) {
+        this.data = data;
     }
 
     public void setSize(int width, int height) {

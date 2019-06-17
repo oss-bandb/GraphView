@@ -41,18 +41,22 @@ public class SugiyamaEdgeRenderer extends ArrowEdgeRenderer {
                 final List<Float> bendPoints = edgeData.get(edge).bendPoints;
                 final int size = bendPoints.size();
 
-                path.reset();
-                path.moveTo(bendPoints.get(0), bendPoints.get(1));
 
-                for (int i = 3; i < size; i = i + 2) {
-                    path.lineTo(bendPoints.get(i - 1), bendPoints.get(i));
-                }
-                canvas.drawPath(path, paint);
                 if (nodeData.get(source).isReversed()) {
                     clippedLine = clipLine(bendPoints.get(2), bendPoints.get(3), bendPoints.get(0), bendPoints.get(1), destination);
                 } else {
                     clippedLine = clipLine(bendPoints.get(size - 4), bendPoints.get(size - 3), bendPoints.get(size - 2), bendPoints.get(size - 1), destination);
                 }
+
+                float[] triangleCentroid = drawTriangle(canvas, trianglePaint, clippedLine[0], clippedLine[1], clippedLine[2], clippedLine[3]);
+
+                path.reset();
+                path.moveTo(bendPoints.get(0), bendPoints.get(1));
+                for (int i = 3; i < size - 2; i = i + 2) {
+                    path.lineTo(bendPoints.get(i - 1), bendPoints.get(i));
+                }
+                path.lineTo(triangleCentroid[0], triangleCentroid[1]);
+                canvas.drawPath(path, paint);
             } else {
                 final float startX = sourcePosition.getX() + source.getWidth() / 2f;
                 final float startY = sourcePosition.getY() + source.getHeight() / 2f;
@@ -60,13 +64,13 @@ public class SugiyamaEdgeRenderer extends ArrowEdgeRenderer {
                 float stopY = destinationPosition.getY() + destination.getHeight() / 2f;
 
                 clippedLine = clipLine(startX, startY, stopX, stopY, destination);
+                float[] triangleCentroid = drawTriangle(canvas, trianglePaint, clippedLine[0], clippedLine[1], clippedLine[2], clippedLine[3]);
 
                 canvas.drawLine(clippedLine[0],
                         clippedLine[1],
-                        clippedLine[2],
-                        clippedLine[3], paint);
+                        triangleCentroid[0],
+                        triangleCentroid[1], paint);
             }
-            drawTriangle(canvas, trianglePaint, clippedLine[0], clippedLine[1], clippedLine[2], clippedLine[3]);
         }
     }
 }

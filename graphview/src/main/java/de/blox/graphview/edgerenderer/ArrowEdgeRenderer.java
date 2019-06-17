@@ -33,12 +33,13 @@ public class ArrowEdgeRenderer implements EdgeRenderer {
 
             float[] clippedLine = clipLine(startX, startY, stopX, stopY, destination);
 
+            float[] triangleCentroid = drawTriangle(canvas, trianglePaint, clippedLine[0], clippedLine[1], clippedLine[2], clippedLine[3]);
+
             canvas.drawLine(clippedLine[0],
                     clippedLine[1],
-                    clippedLine[2],
-                    clippedLine[3], paint);
+                    triangleCentroid[0],
+                    triangleCentroid[1], paint);
 
-            drawTriangle(canvas, trianglePaint, clippedLine[0], clippedLine[1], clippedLine[2], clippedLine[3]);
         }
     }
 
@@ -102,7 +103,7 @@ public class ArrowEdgeRenderer implements EdgeRenderer {
      * @param x2
      * @param y2
      */
-    protected void drawTriangle(Canvas canvas, Paint paint, float x1, float y1, float x2, float y2) {
+    protected float[] drawTriangle(Canvas canvas, Paint paint, float x1, float y1, float x2, float y2) {
         final float angle = (float) (Math.atan2(y2 - y1, x2 - x1) + Math.PI);
         final float x3 = (float) (x2 + ARROW_LENGTH * Math.cos(angle - ARROW_DEGREES));
         final float y3 = (float) (y2 + ARROW_LENGTH * Math.sin(angle - ARROW_DEGREES));
@@ -116,6 +117,13 @@ public class ArrowEdgeRenderer implements EdgeRenderer {
 
         canvas.drawPath(trianglePath, paint);
 
+        // calculate centroid of the triangle
+        float x = (x2 + x3 + x4) / 3;
+        float y = (y2 + y3 + y4) / 3;
+        float[] triangleCentroid = new float[]{x, y};
+
         trianglePath.reset();
+
+        return triangleCentroid;
     }
 }
