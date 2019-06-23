@@ -22,6 +22,7 @@ public class Graph {
     public void addNode(@NonNull Node node) {
         if (!this.nodes.contains(node)) {
             this.nodes.add(node);
+            node.onAddedToGraph(this);
         }
     }
 
@@ -62,6 +63,7 @@ public class Graph {
         }
 
         nodes.remove(node);
+        node.onRemovedFromGraph(this);
 
         final Iterator<Edge> iterator = edges.iterator();
         while (iterator.hasNext()) {
@@ -82,6 +84,12 @@ public class Graph {
     public void removeNodes(@NonNull Node... nodes) {
         for (int i = 0; i < nodes.length; i++) {
             removeNode(nodes[i]);
+        }
+    }
+
+    void onNodeDataReplaced(Node node) {
+        for (NodeObserver observer : observers) {
+            observer.notifyDataChanged(node);
         }
     }
 

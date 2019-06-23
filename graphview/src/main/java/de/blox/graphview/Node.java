@@ -1,6 +1,9 @@
 package de.blox.graphview;
 
 
+import java.util.IdentityHashMap;
+import java.util.Map;
+
 /**
  *
  */
@@ -8,6 +11,7 @@ public class Node {
     private Vector pos;
     private Object data;
     private Size size;
+    private Map<Graph, Integer> graphCount = new IdentityHashMap<>();
 
     public Node(Object data) {
         this.data = data;
@@ -39,6 +43,13 @@ public class Node {
         this.pos.setY(y);
     }
 
+    public void replaceData(Object data) {
+        this.data = data;
+        for (Graph graph : graphCount.keySet()) {
+            graph.onNodeDataReplaced(this);
+        }
+    }
+
     public Object getData() {
         return data;
     }
@@ -53,6 +64,24 @@ public class Node {
 
     public int getHeight() {
         return size.getHeight();
+    }
+
+    void onAddedToGraph(Graph graph) {
+        Integer count = graphCount.get(graph);
+        if (count == null)
+            count = 1;
+        graphCount.put(graph, count + 1);
+    }
+
+    void onRemovedFromGraph(Graph graph) {
+        Integer count = graphCount.get(graph);
+        if (count == null)
+            throw new IllegalStateException("Node shouldn't be removed from a graph not associated with");
+        if (count == 1) {
+            graphCount.remove(graph);
+        } else {
+            graphCount.put(graph, count -1 );
+        }
     }
 
     @Override
