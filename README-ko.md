@@ -1,19 +1,17 @@
-**Note: This library is in an early stage of development. There will be breaking changes to the public API until the first stable version is released.**
-
-Translations: [한국어](README-ko.md)
+**참고: 이 라이브러리는 개발 초기 단계에 있습니다. Stable version 출시 전 까지 공개 API에 큰 변화가 있을 수 있습니다.**
 
 GraphView
 ===========
 
-Android GraphView is used to display data in graph structures.
+Android GraphView는 데이터를 그래프 형태로 보여주는 데 사용됩니다.
 
 ![alt Logo](image/GraphView_logo.png "Graph Logo")
 
-Overview
+개요
 ========
-The library is designed to support different graph layouts.
+이 라이브러리는 다른 그래츠 레이아웃을 지원하기 위해 디자인되었습니다.
 
-Download
+다운로드
 ========
 
 ```groovy
@@ -21,9 +19,9 @@ dependencies {
     implementation 'de.blox:graphview:0.6.0'
 }
 ```
-Layouts
+레이아웃
 ======
-### Tree
+### 트리
 Uses Walker's algorithm with Buchheim's runtime improvements (`BuchheimWalkerAlgorithm` class). Supports different orientations. All you have to do is using the `BuchheimWalkerConfiguration.Builder.setOrientation(int)` with either `ORIENTATION_LEFT_RIGHT`, `ORIENTATION_RIGHT_LEFT`, `ORIENTATION_TOP_BOTTOM` and
 `ORIENTATION_BOTTOM_TOP` (default). Furthermore parameters like sibling-, level-, subtree separation can be set.
 ### Directed graph
