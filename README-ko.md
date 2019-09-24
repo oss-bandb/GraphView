@@ -22,12 +22,12 @@ dependencies {
 레이아웃
 ======
 ### 트리
-Walker's algorithm with Buchheim's runtime improvements를 사용하였습니다 (`BuchheimWalkerAlgorithm` class). 다른 orientation들을 지원합니다. `BuchheimWalkerConfiguration.Builder.setOrientation(int)` 또는 `ORIENTATION_LEFT_RIGHT`, `ORIENTATION_RIGHT_LEFT`, `ORIENTATION_TOP_BOTTOM` 그리고
+Walker's algorithm with Buchheim's runtime improvements(`BuchheimWalkerAlgorithm` class)를 사용하였습니다. 다양한 orientation들을 지원합니다. `BuchheimWalkerConfiguration.Builder.setOrientation(int)` 또는 `ORIENTATION_LEFT_RIGHT`, `ORIENTATION_RIGHT_LEFT`, `ORIENTATION_TOP_BOTTOM` 그리고
 `ORIENTATION_BOTTOM_TOP` 만 사용하면 됩니다(default). 더 나아가 sibling-, level-, subtree separation과 같은 매개변수 설정 또한 가능합니다.
 ### 방향 그래프
 방향 그래프는 인력/척력을 시뮬레이션하여 그려집니다. 이를 위해  Fruchterman과 Reingold (`FruchtermanReingoldAlgorithm` class)의 알고리즘이 구현되었습니다 (현재 작은 그래프에서만 작동함).
 ### 계층 그래프
-Sugiyama et al의 알고리즘. 여러 계층을 가진 그래프를 그리기 위해, 그래프의 계층적 구조를 이용합니다 (`SugiyamaAlgorithm` class). 또한 `SugiyamaConfiguration.Builder`를 활용하여 노드, 레벨 분할을 위한 매개변수를 설정할 수 있습니다 for node and level separation using the .
+Sugiyama et al의 알고리즘(`SugiyamaAlgorithm` class)을 사용합니다. 여러 계층을 가진 그래프를 그리기 위해, 그래프의 계층적 구조를 이용합니다. 또한 `SugiyamaConfiguration.Builder`를 활용하여 노드, 레벨 분할을 위한 매개변수를 설정할 수 있습니다.
 
 사용
 ======
