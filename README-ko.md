@@ -9,7 +9,7 @@ Android GraphView는 데이터를 그래프 형태로 보여주는 데 사용됩
 
 개요
 ========
-이 라이브러리는 다른 그래츠 레이아웃을 지원하기 위해 디자인되었습니다.
+이 라이브러리는 다른 그래프 레이아웃을 지원하기 위해 개발되었습니다.
 
 다운로드
 ========
@@ -22,14 +22,14 @@ dependencies {
 레이아웃
 ======
 ### 트리
-Uses Walker's algorithm with Buchheim's runtime improvements (`BuchheimWalkerAlgorithm` class). Supports different orientations. All you have to do is using the `BuchheimWalkerConfiguration.Builder.setOrientation(int)` with either `ORIENTATION_LEFT_RIGHT`, `ORIENTATION_RIGHT_LEFT`, `ORIENTATION_TOP_BOTTOM` and
-`ORIENTATION_BOTTOM_TOP` (default). Furthermore parameters like sibling-, level-, subtree separation can be set.
-### Directed graph
-Directed graph drawing by simulating attraction/repulsion forces. For this the algorithm by Fruchterman and Reingold (`FruchtermanReingoldAlgorithm` class) was implemented (currently works only for small graphs).
-### Layered graph
-Algorithm from Sugiyama et al. for drawing multilayer graphs, taking advantage of the hierarchical structure of the graph (`SugiyamaAlgorithm` class). You can also set the parameters for node and level separation using the `SugiyamaConfiguration.Builder`.
+Walker's algorithm with Buchheim's runtime improvements를 사용하였습니다 (`BuchheimWalkerAlgorithm` class). 다른 orientation들을 지원합니다. `BuchheimWalkerConfiguration.Builder.setOrientation(int)` 또는 `ORIENTATION_LEFT_RIGHT`, `ORIENTATION_RIGHT_LEFT`, `ORIENTATION_TOP_BOTTOM` 그리고
+`ORIENTATION_BOTTOM_TOP` 만 사용하면 됩니다(default). 더 나아가 sibling-, level-, subtree separation과 같은 매개변수 설정 또한 가능합니다.
+### 방향 그래프
+방향 그래프는 인력/척력을 시뮬레이션하여 그려집니다. 이를 위해  Fruchterman과 Reingold (`FruchtermanReingoldAlgorithm` class)의 알고리즘이 구현되었습니다 (현재 작은 그래프에서만 작동함).
+### 계층 그래프
+Sugiyama et al의 알고리즘. 여러 계층을 가진 그래프를 그리기 위해, 그래프의 계층적 구조를 이용합니다 (`SugiyamaAlgorithm` class). 또한 `SugiyamaConfiguration.Builder`를 활용하여 노드, 레벨 분할을 위한 매개변수를 설정할 수 있습니다 for node and level separation using the .
 
-Usage
+사용
 ======
 
 ```xml
@@ -43,7 +43,7 @@ Usage
     </de.blox.graphview.GraphView>
 </LinearLayout>
 ```
-You can make the node Layout how you like. Just define a layout file, e.g. ```node.xml``` ...
+노드 레이아웃을 원하는 대로 만들 수 있습니다. ```node.xml```같은 레이아웃 파일을 정의하기만 하면 됩니다.
 ```xml
 <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
                                     xmlns:card_view="http://schemas.android.com/apk/res-auto"
@@ -72,7 +72,7 @@ You can make the node Layout how you like. Just define a layout file, e.g. ```no
 </android.support.v7.widget.CardView>
 ```
 
-... and use it with the adapter
+다음은 adapter와 함께 사용한 예시 입니다.
 
 ```java
 public class MainActivity extends AppCompatActivity {
@@ -84,7 +84,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         GraphView graphView = findViewById(R.id.graph);
 
-        // example tree
+        // 예시 트리
         final Graph graph = new Graph();
         final Node node1 = new Node(getNodeText());
         final Node node2 = new Node(getNodeText());
@@ -111,7 +111,7 @@ public class MainActivity extends AppCompatActivity {
         graph.addEdge(node4, node11);
         graph.addEdge(node11, node12);
 
-        // you can set the graph via the constructor or use the adapter.setGraph(Graph) method
+        // 생성자 또는 dapter.setGraph(Graph) 매서드를 사용하여 그래프를 설정할 수 있습니다.
         final BaseGraphAdapter<ViewHolder> adapter = new BaseGraphAdapter<ViewHolder>(graph) {
         
             @NonNull
@@ -128,7 +128,7 @@ public class MainActivity extends AppCompatActivity {
         };
         graphView.setAdapter(adapter);
         
-        // set the algorithm here
+        // 이 부분에 알고리즘을 설정합니다
         final BuchheimWalkerConfiguration configuration = new BuchheimWalkerConfiguration.Builder()
                 .setSiblingSeparation(100)
                 .setLevelSeparation(300)
@@ -144,7 +144,7 @@ public class MainActivity extends AppCompatActivity {
 }
 ```
 
-Your ViewHolder class should extend from ViewHolder:
+ViewHolder 클래스는 ViewHolder를 extend 해야 합니다:
 ```java
 class SimpleViewHolder extends ViewHolder {
     TextView textView;
@@ -156,34 +156,34 @@ class SimpleViewHolder extends ViewHolder {
 }
 ```
 
-Customization
+사용자 지정
 =============
 
-To use the custom attributes you have to add the namespace first: ```
+커스텀 속성을 사용하려면 먼저 namespace 를 추가해야합니다: ```
     xmlns:app="http://schemas.android.com/apk/res-auto"```
 
-| Attribute        | Format    | Example                        | Explanation|
+| 속성              | 형식      | 예시                              | 설명       |
 |------------------|-----------|--------------------------------|------------|
-| lineThickness   | Dimension | 10dp                           | Set how thick the connection lines should be
-| lineColor       | Color     | "@android:color/holo_red_dark" | Set the color of the connection lines
-| useMaxSize      | Boolean   | true                           | Use the same size for each node
+| lineThickness   | Dimension | 10dp                           | 연결선의 두꺼운 정도를 설정합니다
+| lineColor       | Color     | "@android:color/holo_red_dark" | 연결선의 색상을 설정합니다
+| useMaxSize      | Boolean   | true                           | 각 노드를 동일한 크기로 사용합니다
 
-Each of the attributes has a corresponding setter in the GraphView class, if you want to use it programmatically.
+프로그래밍 방식으로 이를 사용하길 하려는 경우, 각각의 속성은 GraphView 클래스에서 그에 따른 설정을 가집니다.
 
-GraphView internally uses [ZoomLayout](https://github.com/natario1/ZoomLayout)  for its zoom feature. To change the zoom values just use the different attributes described in the ZoomLayout project site.
+GraphView는 내부적으로 [ZoomLayout](https://github.com/natario1/ZoomLayout)를 줌 기능에 사용합니다. 줌 정도 값을 변경하려면 ZoomLayout 프로젝트 사이트에 명시된 다른 속성을 사용하십시오.
 
-Examples
+예시
 ========
-#### Rooted Tree
+#### 트리
 ![alt Example](image/Tree.png "Tree Example")
 
-#### Directed Graph
+#### 방향 그래프
 ![alt Example](image/Graph.png "Graph Example")
 
-#### Layered Graph
+#### 계층 그래프
 ![alt Example](image/LayeredGraph.png "Layered Graph Example")
 
-License
+라이선스
 =======
 
     Copyright 2019 Team-Blox
