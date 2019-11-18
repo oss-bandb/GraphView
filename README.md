@@ -1,4 +1,4 @@
-**Note: This library is in an early stage of development. There will be breaking changes to the public API until the first stable version is released.**
+**Note: This project is currently experimental and the API subject to breaking changes without notice.**
 
 GraphView
 ===========
@@ -9,14 +9,14 @@ Android GraphView is used to display data in graph structures.
 
 Overview
 ========
-The library is designed to support different graph layouts.
+The library is designed to support different graph layouts and currently works with small graphs only.
 
 Download
 ========
 
 ```groovy
 dependencies {
-    implementation 'de.blox:graphview:0.6.0'
+    implementation 'de.blox:graphview:0.6.1'
 }
 ```
 Layouts
@@ -25,7 +25,7 @@ Layouts
 Uses Walker's algorithm with Buchheim's runtime improvements (`BuchheimWalkerAlgorithm` class). Supports different orientations. All you have to do is using the `BuchheimWalkerConfiguration.Builder.setOrientation(int)` with either `ORIENTATION_LEFT_RIGHT`, `ORIENTATION_RIGHT_LEFT`, `ORIENTATION_TOP_BOTTOM` and
 `ORIENTATION_BOTTOM_TOP` (default). Furthermore parameters like sibling-, level-, subtree separation can be set.
 ### Directed graph
-Directed graph drawing by simulating attraction/repulsion forces. For this the algorithm by Fruchterman and Reingold (`FruchtermanReingoldAlgorithm` class) was implemented (currently works only for small graphs).
+Directed graph drawing by simulating attraction/repulsion forces. For this the algorithm by Fruchterman and Reingold (`FruchtermanReingoldAlgorithm` class) was implemented.
 ### Layered graph
 Algorithm from Sugiyama et al. for drawing multilayer graphs, taking advantage of the hierarchical structure of the graph (`SugiyamaAlgorithm` class). You can also set the parameters for node and level separation using the `SugiyamaConfiguration.Builder`.
 
