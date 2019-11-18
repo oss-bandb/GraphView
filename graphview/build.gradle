@@ -29,7 +29,7 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'com.android.support:appcompat-v7:27.1.1'
     implementation 'com.annimon:stream:1.2.1'
-    api 'com.otaliastudios:zoomlayout:1.5.0'
+    api 'com.otaliastudios:zoomlayout:1.7.0'
 }
 
 ext {
