@@ -30,7 +30,7 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'com.android.support:appcompat-v7:27.1.1'
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
-    api 'com.otaliastudios:zoomlayout:1.5.0'
+    api 'com.otaliastudios:zoomlayout:1.7.0'
 }
 
 ext {
@@ -46,7 +46,7 @@ ext {
     siteUrl = "https://github.com/Team-Blox/GraphView"
     gitUrl = "https://github.com/Team-Blox/GraphView.git"
 
-    libraryVersion = '0.6.0'
+    libraryVersion = '0.6.1'
 
     developerId = 'Team-Blox'
     developerName = 'Blox'

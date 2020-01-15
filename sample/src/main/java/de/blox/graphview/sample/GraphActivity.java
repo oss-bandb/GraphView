@@ -75,9 +75,13 @@ public abstract class GraphActivity extends AppCompatActivity {
     private void setupFab(final Graph graph) {
         FloatingActionButton addButton = findViewById(R.id.addNode);
         addButton.setOnClickListener(v -> {
+            final Node newNode = new Node(getNodeText());
+
             if (currentNode != null) {
-                final Node newNode = new Node(getNodeText());
                 graph.addEdge(currentNode, newNode);
+            } else {
+                graph.addNode(newNode);
+                adapter.notifyGraphInvalidated();
             }
         });
 

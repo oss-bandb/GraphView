@@ -80,7 +80,7 @@ class Graph {
         }
     }
 
-    fun hasNodes(): Boolean = !_nodes.isEmpty()
+    fun hasNodes(): Boolean = _nodes.isNotEmpty()
 
     fun getNodeAtPosition(position: Int): Node {
         if (position < 0) {

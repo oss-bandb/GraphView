@@ -10,6 +10,10 @@ import de.blox.graphview.util.VectorF
 abstract class BaseGraphAdapter<VH : ViewHolder> @JvmOverloads constructor(graph: Graph = Graph()) :
     GraphAdapter<VH> {
     override var algorithm: Algorithm = BuchheimWalkerAlgorithm()
+        set(value) {
+            field = value
+            graph.setAsTree(value is BuchheimWalkerAlgorithm)
+        }
     override var graph: Graph = graph
         set(value) {
             graph.removeGraphObserver(this)

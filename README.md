@@ -1,5 +1,3 @@
-**Note: This library is in an early stage of development. There will be breaking changes to the public API until the first stable version is released.**
-
 GraphView
 ===========
 
@@ -9,14 +7,17 @@ Android GraphView is used to display data in graph structures.
 
 Overview
 ========
-The library is designed to support different graph layouts.
+The library is designed to support different graph layouts and currently works with small graphs only.
+
+**This project is currently experimental and the API subject to breaking changes without notice.**
+
 
 Download
 ========
 
 ```groovy
 dependencies {
-    implementation 'de.blox:graphview:0.6.0'
+    implementation 'de.blox:graphview:0.6.1'
 }
 ```
 Layouts
@@ -25,7 +26,7 @@ Layouts
 Uses Walker's algorithm with Buchheim's runtime improvements (`BuchheimWalkerAlgorithm` class). Supports different orientations. All you have to do is using the `BuchheimWalkerConfiguration.Builder.setOrientation(int)` with either `ORIENTATION_LEFT_RIGHT`, `ORIENTATION_RIGHT_LEFT`, `ORIENTATION_TOP_BOTTOM` and
 `ORIENTATION_BOTTOM_TOP` (default). Furthermore parameters like sibling-, level-, subtree separation can be set.
 ### Directed graph
-Directed graph drawing by simulating attraction/repulsion forces. For this the algorithm by Fruchterman and Reingold (`FruchtermanReingoldAlgorithm` class) was implemented (currently works only for small graphs).
+Directed graph drawing by simulating attraction/repulsion forces. For this the algorithm by Fruchterman and Reingold (`FruchtermanReingoldAlgorithm` class) was implemented.
 ### Layered graph
 Algorithm from Sugiyama et al. for drawing multilayer graphs, taking advantage of the hierarchical structure of the graph (`SugiyamaAlgorithm` class). You can also set the parameters for node and level separation using the `SugiyamaConfiguration.Builder`.
 
@@ -45,31 +46,19 @@ Usage
 ```
 You can make the node Layout how you like. Just define a layout file, e.g. ```node.xml``` ...
 ```xml
-<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
-                                    xmlns:card_view="http://schemas.android.com/apk/res-auto"
-                                    android:id="@+id/card_view"
-                                    android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
-                                    android:layout_gravity="center"
-                                    android:layout_margin="5dp"
-                                    card_view:cardBackgroundColor="@android:color/holo_blue_dark"
-                                    card_view:cardElevation="16dp"
-                                    card_view:contentPadding="10dp">
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
-
-        <TextView
-            android:id="@+id/textView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@android:color/white"
-            android:textStyle="bold"/>
-
-    </LinearLayout>
-</android.support.v7.widget.CardView>
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@android:color/white"
+        android:textStyle="bold"/>
+</LinearLayout>
 ```
 
 ... and use it with the adapter
@@ -89,27 +78,9 @@ public class MainActivity extends AppCompatActivity {
         final Node node1 = new Node(getNodeText());
         final Node node2 = new Node(getNodeText());
         final Node node3 = new Node(getNodeText());
-        final Node node4 = new Node(getNodeText());
-        final Node node5 = new Node(getNodeText());
-        final Node node6 = new Node(getNodeText());
-        final Node node8 = new Node(getNodeText());
-        final Node node7 = new Node(getNodeText());
-        final Node node9 = new Node(getNodeText());
-        final Node node10 = new Node(getNodeText());
-        final Node node11 = new Node(getNodeText());
-        final Node node12 = new Node(getNodeText());
 
         graph.addEdge(node1, node2);
         graph.addEdge(node1, node3);
-        graph.addEdge(node1, node4);
-        graph.addEdge(node2, node5);
-        graph.addEdge(node2, node6);
-        graph.addEdge(node6, node7);
-        graph.addEdge(node6, node8);
-        graph.addEdge(node4, node9);
-        graph.addEdge(node4, node10);
-        graph.addEdge(node4, node11);
-        graph.addEdge(node11, node12);
 
         // you can set the graph via the constructor or use the adapter.setGraph(Graph) method
         final BaseGraphAdapter<ViewHolder> adapter = new BaseGraphAdapter<ViewHolder>(graph) {
