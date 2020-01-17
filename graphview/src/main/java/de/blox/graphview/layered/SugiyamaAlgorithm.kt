@@ -9,9 +9,10 @@ import de.blox.graphview.Node
 import de.blox.graphview.edgerenderer.EdgeRenderer
 import de.blox.graphview.util.Size
 import java.util.*
+import kotlin.math.*
 
 class SugiyamaAlgorithm @JvmOverloads constructor(private val configuration: SugiyamaConfiguration = SugiyamaConfiguration.Builder().build()) :
-    Algorithm {
+        Algorithm {
     private val nodeData: MutableMap<Node, SugiyamaNodeData> = HashMap()
     private val edgeData: MutableMap<Edge, SugiyamaEdgeData> = HashMap()
     private val stack: MutableSet<Node> = HashSet()
@@ -45,10 +46,10 @@ class SugiyamaAlgorithm @JvmOverloads constructor(private val configuration: Sug
         var right = Integer.MIN_VALUE
         var bottom = Integer.MIN_VALUE
         graph.nodes.forEach { node ->
-            left = Math.min(left.toFloat(), node.x).toInt()
-            top = Math.min(top.toFloat(), node.y).toInt()
-            right = Math.max(right.toFloat(), node.x + node.width).toInt()
-            bottom = Math.max(bottom.toFloat(), node.y + node.height).toInt()
+            left = min(left.toFloat(), node.x).toInt()
+            top = min(top.toFloat(), node.y).toInt()
+            right = max(right.toFloat(), node.x + node.width).toInt()
+            bottom = max(bottom.toFloat(), node.y + node.height).toInt()
         }
 
         graphSize = Size(right - left, bottom - top)
@@ -124,15 +125,15 @@ class SugiyamaAlgorithm @JvmOverloads constructor(private val configuration: Sug
 
             for (node in currentLayer) {
                 val edges = this.graph.edges
-                    .filter { (source) -> source == node }
-                    .filter { (_, destination) ->
-                        Math.abs(
-                            nodeData.getValue(destination).layer - nodeData.getValue(
-                                node
-                            ).layer
-                        ) > 1
-                    }
-                    .toMutableList()
+                        .filter { (source) -> source == node }
+                        .filter { (_, destination) ->
+                            abs(
+                                    nodeData.getValue(destination).layer - nodeData.getValue(
+                                            node
+                                    ).layer
+                            ) > 1
+                        }
+                        .toMutableList()
                 val iterator = edges.iterator()
                 while (iterator.hasNext()) {
                     val edge = iterator.next()
@@ -198,8 +199,8 @@ class SugiyamaAlgorithm @JvmOverloads constructor(private val configuration: Sug
                 val previousLayer = layers[i - 1]
                 for (node in currentLayer) {
                     val positions = graph.edges
-                        .filter { (source) -> previousLayer.contains(source) }
-                        .map { (source) -> previousLayer.indexOf(source) }.toMutableList()
+                            .filter { (source) -> previousLayer.contains(source) }
+                            .map { (source) -> previousLayer.indexOf(source) }.toMutableList()
                     positions.sort()
                     val median = positions.size / 2
                     if (!positions.isEmpty()) {
@@ -214,7 +215,7 @@ class SugiyamaAlgorithm @JvmOverloads constructor(private val configuration: Sug
                             val right = positions[positions.size - 1] - positions[median]
                             if (left + right != 0) {
                                 nodeData.getValue(node).median =
-                                    (positions[median - 1] * right + positions[median] * left) / (left + right)
+                                        (positions[median - 1] * right + positions[median] * left) / (left + right)
                             }
                         }
                     }
@@ -232,17 +233,17 @@ class SugiyamaAlgorithm @JvmOverloads constructor(private val configuration: Sug
                 for (i in currentLayer.size - 1 downTo 1) {
                     val node = currentLayer[i]
                     val positions = graph.edges
-                        .filter { (source) -> previousLayer.contains(source) }
-                        .map { (source) -> previousLayer.indexOf(source) }.toMutableList()
+                            .filter { (source) -> previousLayer.contains(source) }
+                            .map { (source) -> previousLayer.indexOf(source) }.toMutableList()
                     positions.sort()
                     if (!positions.isEmpty()) {
                         if (positions.size == 1) {
                             nodeData.getValue(node).median = positions[0]
                         } else {
                             nodeData.getValue(node).median =
-                                (positions[Math.ceil(positions.size / 2.0).toInt()] + positions[Math.ceil(
-                                    positions.size / 2.0
-                                ).toInt() - 1]) / 2
+                                    (positions[ceil(positions.size / 2.0).toInt()] + positions[ceil(
+                                            positions.size / 2.0
+                                    ).toInt() - 1]) / 2
                         }
                     }
                 }
@@ -283,20 +284,20 @@ class SugiyamaAlgorithm @JvmOverloads constructor(private val configuration: Sug
         var crossing = 0
 
         val parentNodesN1 = graph.edges
-            .filter { (_, destination) -> destination == n1 }
-            .map { it.source }
-            .toList()
+                .filter { (_, destination) -> destination == n1 }
+                .map { it.source }
+                .toList()
 
         val parentNodesN2 = graph.edges
-            .filter { (_, destination) -> destination == n2 }
-            .map { it.source }
-            .toList()
+                .filter { (_, destination) -> destination == n2 }
+                .map { it.source }
+                .toList()
 
         parentNodesN2.forEach { pn2 ->
             val indexOfPn2 = northernNodes.indexOf(pn2)
             repeat(
-                parentNodesN1
-                    .filter { indexOfPn2 < northernNodes.indexOf(it) }.size
+                    parentNodesN1
+                            .filter { indexOfPn2 < northernNodes.indexOf(it) }.size
             ) { crossing++ }
         }
         return crossing
@@ -357,22 +358,22 @@ class SugiyamaAlgorithm @JvmOverloads constructor(private val configuration: Sug
                 val k = 2 * downward + leftToRight
 
                 verticalAlignment(
-                    root[k],
-                    align[k],
-                    type1Conflicts,
-                    downward == 0,
-                    leftToRight == 0
+                        root[k],
+                        align[k],
+                        type1Conflicts,
+                        downward == 0,
+                        leftToRight == 0
                 )
                 computeBlockWidths(root[k], blockWidth[k])
                 horizontalCompactation(
-                    align[k],
-                    root[k],
-                    sink[k],
-                    shift[k],
-                    blockWidth[k],
-                    x[k],
-                    leftToRight == 0,
-                    downward == 0
+                        align[k],
+                        root[k],
+                        sink[k],
+                        shift[k],
+                        blockWidth[k],
+                        x[k],
+                        leftToRight == 0,
+                        downward == 0
                 )
             }
         }
@@ -380,8 +381,8 @@ class SugiyamaAlgorithm @JvmOverloads constructor(private val configuration: Sug
     }
 
     private fun balance(
-        x: List<MutableMap<Node, Float>>,
-        blockWidth: List<MutableMap<Node, Float>>
+            x: List<MutableMap<Node, Float>>,
+            blockWidth: List<MutableMap<Node, Float>>
     ) {
         val coordinates = HashMap<Node, Float>()
 
@@ -415,38 +416,38 @@ class SugiyamaAlgorithm @JvmOverloads constructor(private val configuration: Sug
 
         // align the layouts to the one with smallest width
         (0..3).filter { it != smallestWidthLayout }
-            .forEach {
-                // align the left to right layouts to the left border of the
-                // smallest layout
-                if (it == 0 || it == 1) {
-                    val diff = min[it] - min[smallestWidthLayout]
-                    for (n in x[it].keys) {
-                        if (diff > 0) {
-                            x[it][n] = x[it].getValue(n) - diff
-                        } else {
-                            x[it][n] = x[it].getValue(n) + diff
+                .forEach {
+                    // align the left to right layouts to the left border of the
+                    // smallest layout
+                    if (it == 0 || it == 1) {
+                        val diff = min[it] - min[smallestWidthLayout]
+                        for (n in x[it].keys) {
+                            if (diff > 0) {
+                                x[it][n] = x[it].getValue(n) - diff
+                            } else {
+                                x[it][n] = x[it].getValue(n) + diff
+                            }
                         }
-                    }
 
-                    // align the right to left layouts to the right border of
-                    // the smallest layout
-                } else {
-                    val diff = max[it] - max[smallestWidthLayout]
-                    x[it].keys.forEach { n ->
-                        if (diff > 0) {
-                            x[it][n] = x[it].getValue(n) - diff
-                        } else {
-                            x[it][n] = x[it].getValue(n) + diff
+                        // align the right to left layouts to the right border of
+                        // the smallest layout
+                    } else {
+                        val diff = max[it] - max[smallestWidthLayout]
+                        x[it].keys.forEach { n ->
+                            if (diff > 0) {
+                                x[it][n] = x[it].getValue(n) - diff
+                            } else {
+                                x[it][n] = x[it].getValue(n) + diff
+                            }
                         }
                     }
                 }
-            }
 
         // get the minimum coordinate value
         var minValue = (0..3)
-            .flatMap { x[it].values }
-            .min()
-            ?: java.lang.Float.MAX_VALUE
+                .flatMap { x[it].values }
+                .min()
+                ?: java.lang.Float.MAX_VALUE
 
         // set left border to 0
         if (minValue != 0f) {
@@ -470,7 +471,7 @@ class SugiyamaAlgorithm @JvmOverloads constructor(private val configuration: Sug
 
         // get the minimum coordinate value
         minValue = coordinates.values.min()
-            ?: Integer.MAX_VALUE.toFloat()
+                ?: Integer.MAX_VALUE.toFloat()
 
         // set left border to 0
         when {
@@ -552,11 +553,11 @@ class SugiyamaAlgorithm @JvmOverloads constructor(private val configuration: Sug
     }
 
     private fun verticalAlignment(
-        root: MutableMap<Node, Node>,
-        align: MutableMap<Node, Node>,
-        type1Conflicts: List<List<Boolean>>,
-        downward: Boolean,
-        leftToRight: Boolean
+            root: MutableMap<Node, Node>,
+            align: MutableMap<Node, Node>,
+            type1Conflicts: List<List<Boolean>>,
+            downward: Boolean,
+            leftToRight: Boolean
     ) {
         // for all Level
         var i = if (downward) 0 else layers.size - 1
@@ -571,7 +572,7 @@ class SugiyamaAlgorithm @JvmOverloads constructor(private val configuration: Sug
                 val adjNodes = getAdjNodes(v, downward)
                 if (adjNodes.isNotEmpty()) {
                     // the first median
-                    val median = Math.floor((adjNodes.size + 1) / 2.0).toInt()
+                    val median = floor((adjNodes.size + 1) / 2.0).toInt()
                     val medianCount = if (adjNodes.size % 2 == 1) 1 else 2
 
                     // for all median neighbours in direction of H
@@ -580,9 +581,9 @@ class SugiyamaAlgorithm @JvmOverloads constructor(private val configuration: Sug
                         val posM = pos(m)
 
                         if (align[v] == v
-                            // if segment (u,v) not marked by type1 conflicts AND ...
-                            && !type1Conflicts[pos(v)][posM]
-                            && (leftToRight && r < posM || !leftToRight && r > posM)
+                                // if segment (u,v) not marked by type1 conflicts AND ...
+                                && !type1Conflicts[pos(v)][posM]
+                                && (leftToRight && r < posM || !leftToRight && r > posM)
                         ) {
                             align[m] = v
                             root[v] = root.getValue(m)
@@ -598,24 +599,24 @@ class SugiyamaAlgorithm @JvmOverloads constructor(private val configuration: Sug
     }
 
     private fun computeBlockWidths(
-        root: MutableMap<Node, Node>,
-        blockWidth: MutableMap<Node, Float>
+            root: MutableMap<Node, Node>,
+            blockWidth: MutableMap<Node, Float>
     ) {
         graph.nodes.forEach { v ->
             val r = root.getValue(v)
-            blockWidth[r] = Math.max(blockWidth.getValue(r), v.width.toFloat())
+            blockWidth[r] = max(blockWidth.getValue(r), v.width.toFloat())
         }
     }
 
     private fun horizontalCompactation(
-        align: MutableMap<Node, Node>,
-        root: MutableMap<Node, Node>,
-        sink: MutableMap<Node, Node>,
-        shift: MutableMap<Node, Float>,
-        blockWidth: MutableMap<Node, Float>,
-        x: MutableMap<Node, Float>,
-        leftToRight: Boolean,
-        downward: Boolean
+            align: MutableMap<Node, Node>,
+            root: MutableMap<Node, Node>,
+            sink: MutableMap<Node, Node>,
+            shift: MutableMap<Node, Float>,
+            blockWidth: MutableMap<Node, Float>,
+            x: MutableMap<Node, Float>,
+            leftToRight: Boolean,
+            downward: Boolean
     ) {
 
         // calculate class relative coordinates for all roots
@@ -665,14 +666,14 @@ class SugiyamaAlgorithm @JvmOverloads constructor(private val configuration: Sug
     }
 
     private fun placeBlock(
-        v: Node,
-        sink: MutableMap<Node, Node>,
-        shift: MutableMap<Node, Float>,
-        x: MutableMap<Node, Float>,
-        align: MutableMap<Node, Node>,
-        blockWidth: MutableMap<Node, Float>,
-        root: MutableMap<Node, Node>,
-        leftToRight: Boolean
+            v: Node,
+            sink: MutableMap<Node, Node>,
+            shift: MutableMap<Node, Float>,
+            x: MutableMap<Node, Float>,
+            align: MutableMap<Node, Node>,
+            blockWidth: MutableMap<Node, Float>,
+            root: MutableMap<Node, Node>,
+            leftToRight: Boolean
     ) {
         if (x[v] == java.lang.Float.MIN_VALUE) {
             x[v] = 0f
@@ -691,34 +692,34 @@ class SugiyamaAlgorithm @JvmOverloads constructor(private val configuration: Sug
 
                     if (sink[v] != sink[u]) {
                         if (leftToRight) {
-                            shift[sink.getValue(u)] = Math.min(
-                                shift.getValue(sink.getValue(u)),
-                                x.getValue(v) - x.getValue(u) - configuration.nodeSeparation.toFloat() - 0.5f * (blockWidth.getValue(
-                                    u
-                                ) + blockWidth.getValue(v))
+                            shift[sink.getValue(u)] = min(
+                                    shift.getValue(sink.getValue(u)),
+                                    x.getValue(v) - x.getValue(u) - configuration.nodeSeparation.toFloat() - 0.5f * (blockWidth.getValue(
+                                            u
+                                    ) + blockWidth.getValue(v))
                             )
                         } else {
-                            shift[sink.getValue(u)] = Math.max(
-                                shift.getValue(sink.getValue(u)),
-                                x.getValue(v) - x.getValue(u) + configuration.nodeSeparation.toFloat() + 0.5f * (blockWidth.getValue(
-                                    u
-                                ) + blockWidth.getValue(v))
+                            shift[sink.getValue(u)] = max(
+                                    shift.getValue(sink.getValue(u)),
+                                    x.getValue(v) - x.getValue(u) + configuration.nodeSeparation.toFloat() + 0.5f * (blockWidth.getValue(
+                                            u
+                                    ) + blockWidth.getValue(v))
                             )
                         }
                     } else {
                         if (leftToRight) {
-                            x[v] = Math.max(
-                                x.getValue(v),
-                                x.getValue(u) + configuration.nodeSeparation.toFloat() + 0.5f * (blockWidth.getValue(
-                                    u
-                                ) + blockWidth.getValue(v))
+                            x[v] = max(
+                                    x.getValue(v),
+                                    x.getValue(u) + configuration.nodeSeparation.toFloat() + 0.5f * (blockWidth.getValue(
+                                            u
+                                    ) + blockWidth.getValue(v))
                             )
                         } else {
-                            x[v] = Math.min(
-                                x.getValue(v),
-                                x.getValue(u) - configuration.nodeSeparation.toFloat() - 0.5f * (blockWidth.getValue(
-                                    u
-                                ) + blockWidth.getValue(v))
+                            x[v] = min(
+                                    x.getValue(v),
+                                    x.getValue(u) - configuration.nodeSeparation.toFloat() - 0.5f * (blockWidth.getValue(
+                                            u
+                                    ) + blockWidth.getValue(v))
                             )
                         }
                     }
@@ -833,7 +834,7 @@ class SugiyamaAlgorithm @JvmOverloads constructor(private val configuration: Sug
                     val successor = graph.successorsOf(current)[0]
 
                     val bendPoints =
-                        edgeData.getValue(graph.getEdgeBetween(predecessor, current)!!).bendPoints
+                            edgeData.getValue(graph.getEdgeBetween(predecessor, current)!!).bendPoints
 
                     if (bendPoints.isEmpty() || !bendPoints.contains(current.x + predecessor.width / 2f)) {
                         bendPoints.add(predecessor.x + predecessor.width / 2f)

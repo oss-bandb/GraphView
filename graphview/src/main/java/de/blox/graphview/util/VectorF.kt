@@ -1,5 +1,7 @@
 package de.blox.graphview.util
 
+import kotlin.math.sqrt
+
 data class VectorF constructor(var x: Float = 0f, var y: Float = 0f) {
 
     fun add(operand: VectorF): VectorF {
@@ -35,6 +37,6 @@ data class VectorF constructor(var x: Float = 0f, var y: Float = 0f) {
     }
 
     fun length(): Float {
-        return Math.sqrt((x * x + y * y).toDouble()).toFloat()
+        return sqrt((x * x + y * y).toDouble()).toFloat()
     }
 }

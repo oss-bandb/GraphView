@@ -5,6 +5,10 @@ import android.graphics.Paint
 import android.graphics.Path
 import de.blox.graphview.Graph
 import de.blox.graphview.Node
+import kotlin.math.PI
+import kotlin.math.atan2
+import kotlin.math.cos
+import kotlin.math.sin
 
 open class ArrowEdgeRenderer : EdgeRenderer {
     private val trianglePath = Path()
@@ -96,11 +100,11 @@ open class ArrowEdgeRenderer : EdgeRenderer {
         x2: Float,
         y2: Float
     ) {
-        val angle = (Math.atan2((y2 - y1).toDouble(), (x2 - x1).toDouble()) + Math.PI).toFloat()
-        val x3 = (x2 + ARROW_LENGTH * Math.cos((angle - ARROW_DEGREES).toDouble())).toFloat()
-        val y3 = (y2 + ARROW_LENGTH * Math.sin((angle - ARROW_DEGREES).toDouble())).toFloat()
-        val x4 = (x2 + ARROW_LENGTH * Math.cos((angle + ARROW_DEGREES).toDouble())).toFloat()
-        val y4 = (y2 + ARROW_LENGTH * Math.sin((angle + ARROW_DEGREES).toDouble())).toFloat()
+        val angle = (atan2((y2 - y1).toDouble(), (x2 - x1).toDouble()) + PI).toFloat()
+        val x3 = (x2 + ARROW_LENGTH * cos((angle - ARROW_DEGREES).toDouble())).toFloat()
+        val y3 = (y2 + ARROW_LENGTH * sin((angle - ARROW_DEGREES).toDouble())).toFloat()
+        val x4 = (x2 + ARROW_LENGTH * cos((angle + ARROW_DEGREES).toDouble())).toFloat()
+        val y4 = (y2 + ARROW_LENGTH * sin((angle + ARROW_DEGREES).toDouble())).toFloat()
 
         trianglePath.moveTo(x2, y2) // Top
         trianglePath.lineTo(x3, y3) // Bottom left

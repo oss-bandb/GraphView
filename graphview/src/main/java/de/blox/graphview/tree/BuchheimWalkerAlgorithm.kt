@@ -9,6 +9,8 @@ import de.blox.graphview.edgerenderer.EdgeRenderer
 import de.blox.graphview.util.Size
 import de.blox.graphview.util.VectorF
 import java.util.*
+import kotlin.math.max
+import kotlin.math.min
 
 class BuchheimWalkerAlgorithm @JvmOverloads constructor(private val configuration: BuchheimWalkerConfiguration = BuchheimWalkerConfiguration.Builder().build()) :
     Algorithm {
@@ -47,10 +49,10 @@ class BuchheimWalkerAlgorithm @JvmOverloads constructor(private val configuratio
         val nodeData = createNodeData(node)
         nodeData.depth = depth
         nodeData.number = number
-        minNodeHeight = Math.min(minNodeHeight, node.height)
-        minNodeWidth = Math.min(minNodeWidth, node.width)
-        maxNodeWidth = Math.max(maxNodeWidth, node.width)
-        maxNodeHeight = Math.max(maxNodeHeight, node.height)
+        minNodeHeight = min(minNodeHeight, node.height)
+        minNodeWidth = min(minNodeWidth, node.width)
+        maxNodeWidth = max(maxNodeWidth, node.width)
+        maxNodeHeight = max(maxNodeHeight, node.height)
 
         if (isLeaf(graph, node)) {
             // if the node has no left sibling, prelim(node) should be set to 0, but we don't have to set it
@@ -113,10 +115,10 @@ class BuchheimWalkerAlgorithm @JvmOverloads constructor(private val configuratio
         var right = Integer.MIN_VALUE
         var bottom = Integer.MIN_VALUE
         graph.nodes.forEach { node ->
-            left = Math.min(left.toFloat(), node.x).toInt()
-            top = Math.min(top.toFloat(), node.y).toInt()
-            right = Math.max(right.toFloat(), node.x + node.width).toInt()
-            bottom = Math.max(bottom.toFloat(), node.y + node.height).toInt()
+            left = min(left.toFloat(), node.x).toInt()
+            top = min(top.toFloat(), node.y).toInt()
+            right = max(right.toFloat(), node.x + node.width).toInt()
+            bottom = max(bottom.toFloat(), node.y + node.height).toInt()
         }
 
         graphSize = Size(right - left, bottom - top)
@@ -370,21 +372,21 @@ class BuchheimWalkerAlgorithm @JvmOverloads constructor(private val configuratio
             when (configuration.orientation) {
                 BuchheimWalkerConfiguration.ORIENTATION_TOP_BOTTOM -> if (height > minNodeHeight) {
                     val diff = height - minNodeHeight
-                    localPadding = Math.max(localPadding, diff)
+                    localPadding = max(localPadding, diff)
                 }
                 BuchheimWalkerConfiguration.ORIENTATION_BOTTOM_TOP -> if (height < localMaxSize.height) {
                     val diff = localMaxSize.height - height
                     node.setPosition(node.position.subtract(VectorF(0f, diff.toFloat())))
-                    localPadding = Math.max(localPadding, diff)
+                    localPadding = max(localPadding, diff)
                 }
                 BuchheimWalkerConfiguration.ORIENTATION_LEFT_RIGHT -> if (width > minNodeWidth) {
                     val diff = width - minNodeWidth
-                    localPadding = Math.max(localPadding, diff)
+                    localPadding = max(localPadding, diff)
                 }
                 BuchheimWalkerConfiguration.ORIENTATION_RIGHT_LEFT -> if (width < localMaxSize.width) {
                     val diff = localMaxSize.width - width
                     node.setPosition(node.position.subtract(VectorF(0f, diff.toFloat())))
-                    localPadding = Math.max(localPadding, diff)
+                    localPadding = max(localPadding, diff)
                 }
             }
 
@@ -397,8 +399,8 @@ class BuchheimWalkerAlgorithm @JvmOverloads constructor(private val configuratio
         var height = Integer.MIN_VALUE
 
         nodes.forEach { node ->
-            width = Math.max(width, node.width)
-            height = Math.max(height, node.height)
+            width = max(width, node.width)
+            height = max(height, node.height)
         }
 
         return Size(width, height)
@@ -416,12 +418,12 @@ class BuchheimWalkerAlgorithm @JvmOverloads constructor(private val configuratio
         graph.nodes.forEach { node ->
             when (orientation) {
                 BuchheimWalkerConfiguration.ORIENTATION_TOP_BOTTOM, BuchheimWalkerConfiguration.ORIENTATION_LEFT_RIGHT -> {
-                    offsetX = Math.min(offsetX, node.x)
-                    offsetY = Math.min(offsetY, node.y)
+                    offsetX = min(offsetX, node.x)
+                    offsetY = min(offsetY, node.y)
                 }
                 BuchheimWalkerConfiguration.ORIENTATION_BOTTOM_TOP, BuchheimWalkerConfiguration.ORIENTATION_RIGHT_LEFT -> {
-                    offsetX = Math.min(offsetX, node.x)
-                    offsetY = Math.max(offsetY, node.y)
+                    offsetX = min(offsetX, node.x)
+                    offsetY = max(offsetY, node.y)
                 }
             }
         }

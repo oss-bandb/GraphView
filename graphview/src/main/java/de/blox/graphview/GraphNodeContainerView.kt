@@ -10,6 +10,8 @@ import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.View
 import android.widget.AdapterView
+import kotlin.math.max
+import kotlin.math.min
 
 internal class GraphNodeContainerView @JvmOverloads constructor(
     context: Context,
@@ -97,10 +99,10 @@ internal class GraphNodeContainerView @JvmOverloads constructor(
 
             child.layout(left, top, right, bottom)
 
-            maxRight = Math.max(maxRight, right)
-            maxLeft = Math.min(maxLeft, left)
-            maxBottom = Math.max(maxBottom, bottom)
-            maxTop = Math.min(maxTop, top)
+            maxRight = max(maxRight, right)
+            maxLeft = min(maxLeft, left)
+            maxBottom = max(maxBottom, bottom)
+            maxTop = min(maxTop, top)
         }
     }
 
@@ -234,9 +236,9 @@ internal class GraphNodeContainerView @JvmOverloads constructor(
                 height = measuredHeight
             }
 
-            maxWidth = Math.max(maxWidth, measuredWidth)
-            maxHeight = Math.max(maxHeight, measuredHeight)
-            minHeight = Math.min(minHeight, measuredHeight)
+            maxWidth = max(maxWidth, measuredWidth)
+            maxHeight = max(maxHeight, measuredHeight)
+            minHeight = min(minHeight, measuredHeight)
         }
 
         maxChildWidth = maxWidth
