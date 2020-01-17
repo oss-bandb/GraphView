@@ -126,13 +126,7 @@ class SugiyamaAlgorithm @JvmOverloads constructor(private val configuration: Sug
             for (node in currentLayer) {
                 val edges = this.graph.edges
                         .filter { (source) -> source == node }
-                        .filter { (_, destination) ->
-                            abs(
-                                    nodeData.getValue(destination).layer - nodeData.getValue(
-                                            node
-                                    ).layer
-                            ) > 1
-                        }
+                        .filter { (_, destination) -> abs(nodeData.getValue(destination).layer - nodeData.getValue(node).layer) > 1 }
                         .toMutableList()
                 val iterator = edges.iterator()
                 while (iterator.hasNext()) {
@@ -203,7 +197,7 @@ class SugiyamaAlgorithm @JvmOverloads constructor(private val configuration: Sug
                             .map { (source) -> previousLayer.indexOf(source) }.toMutableList()
                     positions.sort()
                     val median = positions.size / 2
-                    if (!positions.isEmpty()) {
+                    if (positions.isNotEmpty()) {
                         if (positions.size == 1) {
                             nodeData.getValue(node).median = -1
                         } else if (positions.size == 2) {
@@ -236,14 +230,11 @@ class SugiyamaAlgorithm @JvmOverloads constructor(private val configuration: Sug
                             .filter { (source) -> previousLayer.contains(source) }
                             .map { (source) -> previousLayer.indexOf(source) }.toMutableList()
                     positions.sort()
-                    if (!positions.isEmpty()) {
+                    if (positions.isNotEmpty()) {
                         if (positions.size == 1) {
                             nodeData.getValue(node).median = positions[0]
                         } else {
-                            nodeData.getValue(node).median =
-                                    (positions[ceil(positions.size / 2.0).toInt()] + positions[ceil(
-                                            positions.size / 2.0
-                                    ).toInt() - 1]) / 2
+                            nodeData.getValue(node).median = (positions[ceil(positions.size / 2.0).toInt()] + positions[ceil(positions.size / 2.0).toInt() - 1]) / 2
                         }
                     }
                 }
@@ -488,9 +479,9 @@ class SugiyamaAlgorithm @JvmOverloads constructor(private val configuration: Sug
     private fun markType1Conflicts(downward: Boolean): List<List<Boolean>> {
         val type1Conflicts = ArrayList<ArrayList<Boolean>>()
 
-        for (i in 0 until graph.nodes.size) {
+        for (i in graph.nodes.indices) {
             type1Conflicts.add(ArrayList())
-            for (l in 0 until graph.edges.size) {
+            for (l in graph.edges.indices) {
                 type1Conflicts[i].add(false)
             }
         }
@@ -692,38 +683,17 @@ class SugiyamaAlgorithm @JvmOverloads constructor(private val configuration: Sug
 
                     if (sink[v] != sink[u]) {
                         if (leftToRight) {
-                            shift[sink.getValue(u)] = min(
-                                    shift.getValue(sink.getValue(u)),
-                                    x.getValue(v) - x.getValue(u) - configuration.nodeSeparation.toFloat() - 0.5f * (blockWidth.getValue(
-                                            u
-                                    ) + blockWidth.getValue(v))
-                            )
+                            shift[sink.getValue(u)] = min(shift.getValue(sink.getValue(u)), x.getValue(v) - x.getValue(u) - configuration.nodeSeparation.toFloat() - 0.5f * (blockWidth.getValue(u) + blockWidth.getValue(v)))
                         } else {
-                            shift[sink.getValue(u)] = max(
-                                    shift.getValue(sink.getValue(u)),
-                                    x.getValue(v) - x.getValue(u) + configuration.nodeSeparation.toFloat() + 0.5f * (blockWidth.getValue(
-                                            u
-                                    ) + blockWidth.getValue(v))
-                            )
+                            shift[sink.getValue(u)] = max(shift.getValue(sink.getValue(u)), x.getValue(v) - x.getValue(u) + configuration.nodeSeparation.toFloat() + 0.5f * (blockWidth.getValue(u) + blockWidth.getValue(v)))
                         }
                     } else {
                         if (leftToRight) {
-                            x[v] = max(
-                                    x.getValue(v),
-                                    x.getValue(u) + configuration.nodeSeparation.toFloat() + 0.5f * (blockWidth.getValue(
-                                            u
-                                    ) + blockWidth.getValue(v))
-                            )
+                            x[v] = max(x.getValue(v), x.getValue(u) + configuration.nodeSeparation.toFloat() + 0.5f * (blockWidth.getValue(u) + blockWidth.getValue(v)))
                         } else {
-                            x[v] = min(
-                                    x.getValue(v),
-                                    x.getValue(u) - configuration.nodeSeparation.toFloat() - 0.5f * (blockWidth.getValue(
-                                            u
-                                    ) + blockWidth.getValue(v))
-                            )
+                            x[v] = min(x.getValue(v), x.getValue(u) - configuration.nodeSeparation.toFloat() - 0.5f * (blockWidth.getValue(u) + blockWidth.getValue(v)))
                         }
                     }
-
                 }
                 w = align.getValue(w)
             } while (w != v)
