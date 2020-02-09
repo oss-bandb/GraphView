@@ -1,7 +1,7 @@
 package de.blox.graphview.sample.Algorithms;
 
 import de.blox.graphview.Graph;
-import de.blox.graphview.GraphAdapter;
+import de.blox.graphview.GraphView;
 import de.blox.graphview.Node;
 import de.blox.graphview.layered.SugiyamaAlgorithm;
 import de.blox.graphview.sample.GraphActivity;
@@ -73,7 +73,7 @@ public class SugiyamaActivity extends GraphActivity {
     }
 
     @Override
-    public void setAlgorithm(GraphAdapter adapter) {
-        adapter.setAlgorithm(new SugiyamaAlgorithm());
+    public void setLayout(GraphView view) {
+        view.setLayout(new SugiyamaAlgorithm());
     }
 }

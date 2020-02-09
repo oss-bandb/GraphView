@@ -3,9 +3,9 @@ package de.blox.graphview.energy
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.RectF
-import de.blox.graphview.Algorithm
 import de.blox.graphview.Edge
 import de.blox.graphview.Graph
+import de.blox.graphview.Layout
 import de.blox.graphview.Node
 import de.blox.graphview.edgerenderer.ArrowEdgeRenderer
 import de.blox.graphview.edgerenderer.EdgeRenderer
@@ -17,7 +17,7 @@ import kotlin.math.min
 import kotlin.math.sqrt
 
 class FruchtermanReingoldAlgorithm @JvmOverloads constructor(private val iterations: Int = DEFAULT_ITERATIONS) :
-    Algorithm {
+        Layout {
     private var edgeRenderer: EdgeRenderer = ArrowEdgeRenderer()
     private val disps: MutableMap<Node, VectorF> = HashMap()
     private val rand = Random(SEED)

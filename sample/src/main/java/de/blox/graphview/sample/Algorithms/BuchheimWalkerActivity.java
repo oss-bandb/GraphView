@@ -5,7 +5,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 
 import de.blox.graphview.Graph;
-import de.blox.graphview.GraphAdapter;
+import de.blox.graphview.GraphView;
 import de.blox.graphview.Node;
 import de.blox.graphview.sample.GraphActivity;
 import de.blox.graphview.sample.R;
@@ -44,7 +44,7 @@ public class BuchheimWalkerActivity extends GraphActivity {
             default:
                 return super.onOptionsItemSelected(item);
         }
-        adapter.setAlgorithm(new BuchheimWalkerAlgorithm(builder.build()));
+        graphView.setLayout(new BuchheimWalkerAlgorithm(builder.build()));
         return true;
     }
 
@@ -80,13 +80,13 @@ public class BuchheimWalkerActivity extends GraphActivity {
     }
 
     @Override
-    public void setAlgorithm(GraphAdapter adapter) {
+    public void setLayout(GraphView view) {
         final BuchheimWalkerConfiguration configuration = new BuchheimWalkerConfiguration.Builder()
                 .setSiblingSeparation(100)
                 .setLevelSeparation(300)
                 .setSubtreeSeparation(300)
                 .setOrientation(BuchheimWalkerConfiguration.ORIENTATION_TOP_BOTTOM)
                 .build();
-        adapter.setAlgorithm(new BuchheimWalkerAlgorithm(configuration));
+        view.setLayout(new BuchheimWalkerAlgorithm(configuration));
     }
 }

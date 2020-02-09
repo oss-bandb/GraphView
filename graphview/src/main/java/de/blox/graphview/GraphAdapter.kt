@@ -1,20 +1,68 @@
 package de.blox.graphview
 
+import android.database.DataSetObservable
+import android.database.DataSetObserver
+import android.view.View
 import android.view.ViewGroup
 import android.widget.Adapter
-import de.blox.graphview.util.VectorF
+import androidx.annotation.NonNull
 
-interface GraphAdapter<VH : ViewHolder> : Adapter, GraphObserver {
-    var algorithm: Algorithm
-    var graph: Graph
+abstract class GraphAdapter<VH : GraphView.ViewHolder>(var graph: Graph) : Adapter {
 
-    fun notifySizeChanged()
+    private val dataSetObservable = DataSetObservable()
+    private var graphViewObserver: DataSetObserver? = null
 
-    fun getNode(position: Int): Node
+    fun notifyDataSetChanged() {
+        synchronized(this) {
+            graphViewObserver?.onChanged()
+        }
+        dataSetObservable.notifyChanged()
+    }
 
-    fun getScreenPosition(position: Int): VectorF
+    override fun registerDataSetObserver(observer: DataSetObserver) {
+        dataSetObservable.registerObserver(observer)
+    }
 
-    fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VH
+    override fun unregisterDataSetObserver(observer: DataSetObserver) {
+        dataSetObservable.unregisterObserver(observer)
+    }
 
-    fun onBindViewHolder(viewHolder: VH, data: Any, position: Int)
+    open fun setGraphViewObserver(observer: DataSetObserver?) {
+        synchronized(this) { graphViewObserver = observer }
+    }
+
+    @NonNull
+    abstract fun onCreateViewHolder(@NonNull parent: ViewGroup, viewType: Int): VH
+
+    abstract fun onBindViewHolder(@NonNull viewHolder: VH, data: Any, position: Int)
+
+    override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
+        val view: View
+        val viewHolder: VH
+
+        if (convertView == null) {
+            viewHolder = onCreateViewHolder(parent, getItemViewType(position))
+            view = viewHolder.itemView
+            view.tag = viewHolder
+        } else {
+            viewHolder = convertView.tag as VH
+            view = viewHolder.itemView
+        }
+
+        onBindViewHolder(viewHolder, getItem(position), position)
+
+        return view
+    }
+
+    override fun getItemId(position: Int): Long = NO_ID
+
+    override fun hasStableIds(): Boolean = false
+
+    override fun getItemViewType(position: Int): Int = 0
+
+    override fun getViewTypeCount(): Int = 0
+
+    companion object {
+        const val NO_ID: Long = -1
+    }
 }

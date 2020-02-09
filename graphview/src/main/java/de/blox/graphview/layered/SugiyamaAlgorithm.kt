@@ -2,9 +2,9 @@ package de.blox.graphview.layered
 
 import android.graphics.Canvas
 import android.graphics.Paint
-import de.blox.graphview.Algorithm
 import de.blox.graphview.Edge
 import de.blox.graphview.Graph
+import de.blox.graphview.Layout
 import de.blox.graphview.Node
 import de.blox.graphview.edgerenderer.EdgeRenderer
 import de.blox.graphview.util.Size
@@ -12,7 +12,7 @@ import java.util.*
 import kotlin.math.*
 
 class SugiyamaAlgorithm @JvmOverloads constructor(private val configuration: SugiyamaConfiguration = SugiyamaConfiguration.Builder().build()) :
-        Algorithm {
+        Layout {
     private val nodeData: MutableMap<Node, SugiyamaNodeData> = HashMap()
     private val edgeData: MutableMap<Edge, SugiyamaEdgeData> = HashMap()
     private val stack: MutableSet<Node> = HashSet()

@@ -6,7 +6,7 @@ import android.graphics.Paint
 import de.blox.graphview.edgerenderer.EdgeRenderer
 import de.blox.graphview.util.Size
 
-interface Algorithm {
+interface Layout {
     val graphSize: Size
     fun run(graph: Graph)
     fun drawEdges(canvas: Canvas, graph: Graph, linePaint: Paint)
