@@ -17,7 +17,7 @@ Download
 
 ```groovy
 dependencies {
-    implementation 'de.blox:graphview:0.6.1'
+    implementation 'de.blox:graphview:0.7.0'
 }
 ```
 Layouts
@@ -32,40 +32,38 @@ Algorithm from Sugiyama et al. for drawing multilayer graphs, taking advantage o
 
 Usage
 ======
-
+Using GraphView is not much different than using RecyclerView.
+Add GraphView to your layout file.
 ```xml
-<LinearLayout
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
-    <de.blox.graphview.GraphView
-     android:id="@+id/graph"
-     android:layout_width="match_parent"
-     android:layout_height="match_parent">
-    </de.blox.graphview.GraphView>
-</LinearLayout>
-```
-You can make the node Layout how you like. Just define a layout file, e.g. ```node.xml``` ...
-```xml
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<com.otaliastudios.zoom.ZoomLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    app:hasClickableChildren="true">
 
-    <TextView
-        android:id="@+id/textView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textColor="@android:color/white"
-        android:textStyle="bold"/>
-</LinearLayout>
+    <de.blox.graphview.GraphView
+        android:id="@+id/graph"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:lineColor="@android:color/holo_blue_dark"
+        app:lineThickness="2dp"
+        app:useMaxSize="true" />
+</com.otaliastudios.zoom.ZoomLayout>
 ```
 
-... and use it with the adapter
+Currently GraphView must be used together with a Zoom Engine like [ZoomLayout](https://github.com/natario1/ZoomLayout). To change the zoom values just use the different attributes described in the ZoomLayout project site.
+
+Then define the node layout, e.g. ```node.xml```. You can make the node Layout as complex as you want.
+```xml
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/text"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content" />
+```
+
+To create a graph, we need to instantiate the `Graph` class. Next bind your graph to GraphView, for that you must extend from the `GraphView.Adapter` class.
 
 ```java
-public class MainActivity extends AppCompatActivity {
-    private int nodeCount = 1;
+public class GraphActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,26 +73,26 @@ public class MainActivity extends AppCompatActivity {
 
         // example tree
         final Graph graph = new Graph();
-        final Node node1 = new Node(getNodeText());
-        final Node node2 = new Node(getNodeText());
-        final Node node3 = new Node(getNodeText());
+        final Node node1 = new Node("Parent");
+        final Node node2 = new Node("Child 1");
+        final Node node3 = new Node("Child 2");
 
         graph.addEdge(node1, node2);
         graph.addEdge(node1, node3);
 
         // you can set the graph via the constructor or use the adapter.setGraph(Graph) method
-        final BaseGraphAdapter<ViewHolder> adapter = new BaseGraphAdapter<ViewHolder>(graph) {
-        
+        adapter = new GraphAdapter<GraphView.ViewHolder>(graph) {
+
             @NonNull
             @Override
-            public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            public GraphView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
                 final View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.node, parent, false);
                 return new SimpleViewHolder(view);
             }
 
             @Override
-            public void onBindViewHolder(ViewHolder viewHolder, Object data, int position) {
-                ((SimpleViewHolder)viewHolder).textView.setText(data.toString());
+            public void onBindViewHolder(GraphView.ViewHolder viewHolder, Object data, int position) {
+                ((SimpleViewHolder) viewHolder).textView.setText(data.toString());
             }
         };
         graphView.setAdapter(adapter);
@@ -106,23 +104,19 @@ public class MainActivity extends AppCompatActivity {
                 .setSubtreeSeparation(300)
                 .setOrientation(BuchheimWalkerConfiguration.ORIENTATION_TOP_BOTTOM)
                 .build();
-        adapter.setAlgorithm(new BuchheimWalkerAlgorithm(configuration));
-    }
-    
-    private String getNodeText() {
-        return "Node " + nodeCount++;
+        adapter.setLayout(new BuchheimWalkerAlgorithm(configuration));
     }
 }
 ```
 
-Your ViewHolder class should extend from ViewHolder:
+Your ViewHolder class should extend from `GraphView.ViewHolder`:
 ```java
-class SimpleViewHolder extends ViewHolder {
+class SimpleViewHolder extends GraphView.ViewHolder {
     TextView textView;
 
     SimpleViewHolder(View itemView) {
         super(itemView);
-        textView = itemView.findViewById(R.id.textView);
+        textView = itemView.findViewById(R.id.text);
     }
 }
 ```
@@ -141,8 +135,6 @@ To use the custom attributes you have to add the namespace first: ```
 
 Each of the attributes has a corresponding setter in the GraphView class, if you want to use it programmatically.
 
-GraphView internally uses [ZoomLayout](https://github.com/natario1/ZoomLayout)  for its zoom feature. To change the zoom values just use the different attributes described in the ZoomLayout project site.
-
 Examples
 ========
 #### Rooted Tree
@@ -157,7 +149,7 @@ Examples
 License
 =======
 
-    Copyright 2019 Team-Blox
+    Copyright 2020 Team-Blox
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
