@@ -24,26 +24,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scrollbars="vertical|horizontal"
-        app:alignment="center"
-        app:animationDuration="280"
-        app:flingEnabled="true"
-        app:hasClickableChildren="true"
-        app:horizontalPanEnabled="true"
-        app:maxZoom="2.5"
-        app:maxZoomType="zoom"
-        app:minZoom="0.7"
-        app:minZoomType="zoom"
-        app:oneFingerScrollEnabled="true"
-        app:overPinchable="true"
-        app:overScrollHorizontal="true"
-        app:overScrollVertical="true"
-        app:scrollEnabled="true"
-        app:threeFingersScrollEnabled="true"
-        app:transformation="centerInside"
-        app:transformationGravity="auto"
-        app:twoFingersScrollEnabled="true"
-        app:verticalPanEnabled="true"
-        app:zoomEnabled="true">
+        app:hasClickableChildren="true">
 
         <de.blox.graphview.GraphView
             android:id="@+id/graph"
@@ -51,7 +32,8 @@
             android:layout_height="match_parent"
             android:layout_marginTop="?attr/actionBarSize"
             app:lineColor="@android:color/holo_blue_dark"
-            app:maxZoom="5.5" />
+            app:lineThickness="2dp"
+            app:useMaxSize="true" />
     </com.otaliastudios.zoom.ZoomLayout>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton

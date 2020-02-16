@@ -191,6 +191,7 @@ class GraphView @JvmOverloads constructor(
         invalidate()
     }
 
+
     fun setLayout(layout: Layout?) {
         if (layout === this.layout) {
             return
@@ -216,8 +217,6 @@ class GraphView @JvmOverloads constructor(
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-        super.onMeasure(widthMeasureSpec, heightMeasureSpec)
-
         val adapter = this.adapter ?: return
 
         var maxWidth = 0

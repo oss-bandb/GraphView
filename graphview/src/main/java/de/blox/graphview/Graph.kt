@@ -124,10 +124,6 @@ class Graph {
         this.isTree = isTree
     }
 
-    fun addGraphObserver(observer: GraphObserver) = graphObserver.add(observer)
-
-    fun removeGraphObserver(observer: GraphObserver) = graphObserver.remove(observer)
-
     private fun notifyGraphObserver() = graphObserver.forEach {
         it.notifyGraphInvalidated()
     }
