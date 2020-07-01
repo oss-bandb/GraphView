@@ -5,10 +5,6 @@ import android.graphics.Paint
 import android.graphics.Path
 import de.blox.graphview.Graph
 import de.blox.graphview.Node
-import kotlin.math.PI
-import kotlin.math.atan2
-import kotlin.math.cos
-import kotlin.math.sin
 
 open class ArrowEdgeRenderer : EdgeRenderer {
     private val trianglePath = Path()
@@ -28,21 +24,12 @@ open class ArrowEdgeRenderer : EdgeRenderer {
 
             val clippedLine = clipLine(startX, startY, stopX, stopY, destination)
 
-            canvas.drawLine(
-                clippedLine[0],
-                clippedLine[1],
-                clippedLine[2],
-                clippedLine[3], paint
-            )
+            val triangleCentroid: FloatArray = drawTriangle(canvas, trianglePaint, clippedLine[0], clippedLine[1], clippedLine[2], clippedLine[3])
 
-            drawTriangle(
-                canvas,
-                trianglePaint,
-                clippedLine[0],
-                clippedLine[1],
-                clippedLine[2],
-                clippedLine[3]
-            )
+            canvas.drawLine(clippedLine[0],
+                    clippedLine[1],
+                    triangleCentroid[0],
+                    triangleCentroid[1], paint)
         }
     }
 
@@ -92,28 +79,34 @@ open class ArrowEdgeRenderer : EdgeRenderer {
         return resultLine
     }
 
-    protected fun drawTriangle(
-        canvas: Canvas,
-        paint: Paint,
-        x1: Float,
-        y1: Float,
-        x2: Float,
-        y2: Float
-    ) {
-        val angle = (atan2((y2 - y1).toDouble(), (x2 - x1).toDouble()) + PI).toFloat()
-        val x3 = (x2 + ARROW_LENGTH * cos((angle - ARROW_DEGREES).toDouble())).toFloat()
-        val y3 = (y2 + ARROW_LENGTH * sin((angle - ARROW_DEGREES).toDouble())).toFloat()
-        val x4 = (x2 + ARROW_LENGTH * cos((angle + ARROW_DEGREES).toDouble())).toFloat()
-        val y4 = (y2 + ARROW_LENGTH * sin((angle + ARROW_DEGREES).toDouble())).toFloat()
-
+    /**
+     * Draws a triangle.
+     *
+     * @param canvas
+     * @param paint
+     * @param x1
+     * @param y1
+     * @param x2
+     * @param y2
+     */
+    protected fun drawTriangle(canvas: Canvas, paint: Paint?, x1: Float, y1: Float, x2: Float, y2: Float): FloatArray {
+        val angle = (Math.atan2(y2 - y1.toDouble(), x2 - x1.toDouble()) + Math.PI).toFloat()
+        val x3 = (x2 + ARROW_LENGTH * Math.cos((angle - ARROW_DEGREES).toDouble())).toFloat()
+        val y3 = (y2 + ARROW_LENGTH * Math.sin((angle - ARROW_DEGREES).toDouble())).toFloat()
+        val x4 = (x2 + ARROW_LENGTH * Math.cos((angle + ARROW_DEGREES).toDouble())).toFloat()
+        val y4 = (y2 + ARROW_LENGTH * Math.sin((angle + ARROW_DEGREES).toDouble())).toFloat()
         trianglePath.moveTo(x2, y2) // Top
         trianglePath.lineTo(x3, y3) // Bottom left
         trianglePath.lineTo(x4, y4) // Bottom right
         trianglePath.close()
+        canvas.drawPath(trianglePath, paint!!)
 
-        canvas.drawPath(trianglePath, paint)
-
+        // calculate centroid of the triangle
+        val x = (x2 + x3 + x4) / 3
+        val y = (y2 + y3 + y4) / 3
+        val triangleCentroid = floatArrayOf(x, y)
         trianglePath.reset()
+        return triangleCentroid
     }
 
     companion object {
