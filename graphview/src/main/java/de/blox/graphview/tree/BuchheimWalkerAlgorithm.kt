@@ -20,7 +20,6 @@ class BuchheimWalkerAlgorithm @JvmOverloads constructor(private val configuratio
     private var minNodeWidth = Integer.MAX_VALUE
     private var maxNodeWidth = Integer.MIN_VALUE
     private var maxNodeHeight = Integer.MIN_VALUE
-    override var graphSize = Size(0, 0)
 
     private val isVertical: Boolean
         get() {
@@ -109,7 +108,7 @@ class BuchheimWalkerAlgorithm @JvmOverloads constructor(private val configuratio
 
     }
 
-    private fun calculateGraphSize(graph: Graph) {
+    private fun calculateGraphSize(graph: Graph): Size {
         var left = Integer.MAX_VALUE
         var top = Integer.MAX_VALUE
         var right = Integer.MIN_VALUE
@@ -121,7 +120,7 @@ class BuchheimWalkerAlgorithm @JvmOverloads constructor(private val configuratio
             bottom = max(bottom.toFloat(), node.y + node.height).toInt()
         }
 
-        graphSize = Size(right - left, bottom - top)
+        return Size(right - left, bottom - top)
     }
 
 
@@ -326,7 +325,7 @@ class BuchheimWalkerAlgorithm @JvmOverloads constructor(private val configuratio
         } else children[children.size - 1]
     }
 
-    override fun run(graph: Graph) {
+    override fun run(graph: Graph, shiftX: Float, shiftY: Float): Size {
         // TODO check for cycles and multiple parents
         mNodeData.clear()
 
@@ -337,7 +336,9 @@ class BuchheimWalkerAlgorithm @JvmOverloads constructor(private val configuratio
 
         positionNodes(graph)
 
-        calculateGraphSize(graph)
+        shiftCoordinates(graph, shiftX, shiftY)
+
+        return calculateGraphSize(graph)
     }
 
     private fun positionNodes(graph: Graph) {
@@ -390,7 +391,13 @@ class BuchheimWalkerAlgorithm @JvmOverloads constructor(private val configuratio
                 }
             }
 
-            node.setPosition(getPosition(node, globalPadding, offset)!!)
+            node.setPosition(getPosition(node, globalPadding, offset))
+        }
+    }
+
+    private fun shiftCoordinates(graph: Graph, shiftX: Float, shiftY: Float) {
+        graph.nodes.forEach { node ->
+            node.setPosition(VectorF(node.x + shiftX, node.y + shiftY))
         }
     }
 
@@ -430,29 +437,28 @@ class BuchheimWalkerAlgorithm @JvmOverloads constructor(private val configuratio
         return VectorF(offsetX, offsetY)
     }
 
-    private fun getPosition(node: Node, globalPadding: Int, offset: VectorF): VectorF? {
-        var position: VectorF? = null
-        when (configuration.orientation) {
-            BuchheimWalkerConfiguration.ORIENTATION_TOP_BOTTOM -> position = VectorF(
-                node.x - offset.x,
-                node.y + globalPadding
-            )
-            BuchheimWalkerConfiguration.ORIENTATION_BOTTOM_TOP -> position = VectorF(
-                node.x - offset.x,
-                offset.y - node.y - globalPadding.toFloat()
-            )
-            BuchheimWalkerConfiguration.ORIENTATION_LEFT_RIGHT -> position = VectorF(
-                node.y + globalPadding,
-                node.x - offset.x
-            )
-            BuchheimWalkerConfiguration.ORIENTATION_RIGHT_LEFT -> position = VectorF(
-                offset.y - node.y - globalPadding.toFloat(),
-                node.x - offset.x
-            )
-        }
-
-        return position
-    }
+    private fun getPosition(node: Node, globalPadding: Int, offset: VectorF): VectorF =
+            when (configuration.orientation) {
+                BuchheimWalkerConfiguration.ORIENTATION_TOP_BOTTOM -> VectorF(
+                        node.x - offset.x,
+                        node.y + globalPadding
+                )
+                BuchheimWalkerConfiguration.ORIENTATION_BOTTOM_TOP -> VectorF(
+                        node.x - offset.x,
+                        offset.y - node.y - globalPadding.toFloat()
+                )
+                BuchheimWalkerConfiguration.ORIENTATION_LEFT_RIGHT -> VectorF(
+                        node.y + globalPadding,
+                        node.x - offset.x
+                )
+                BuchheimWalkerConfiguration.ORIENTATION_RIGHT_LEFT -> VectorF(
+                        offset.y - node.y - globalPadding.toFloat(),
+                        node.x - offset.x
+                )
+                else -> {
+                    throw IllegalStateException("Unknown Orientation! ${configuration.orientation}")
+                }
+            }
 
     private fun sortByLevel(graph: Graph, descending: Boolean): List<Node> {
         val nodes = ArrayList(graph.nodes)
@@ -463,7 +469,7 @@ class BuchheimWalkerAlgorithm @JvmOverloads constructor(private val configuratio
         }
 
         if (descending) {
-            comparator = Collections.reverseOrder<Node>(comparator)
+            comparator = Collections.reverseOrder(comparator)
         }
 
         Collections.sort(nodes, comparator)

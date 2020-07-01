@@ -25,7 +25,7 @@ class SugiyamaEdgeRenderer internal constructor(
             val (x1, y1) = destination.position
             val clippedLine: FloatArray
 
-            if (edgeData.containsKey(edge) && !edgeData.getValue(edge).bendPoints.isEmpty()) {
+            if (edgeData.containsKey(edge) && edgeData.getValue(edge).bendPoints.isNotEmpty()) {
                 // draw bend points
                 val bendPoints = edgeData.getValue(edge).bendPoints
                 val size = bendPoints.size

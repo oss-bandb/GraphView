@@ -43,6 +43,7 @@ class BuchheimWalkerConfiguration private constructor(builder: Builder) {
     }
 
     companion object {
+        // TODO: refactor to sealed class
         const val ORIENTATION_TOP_BOTTOM = 1
         const val ORIENTATION_BOTTOM_TOP = 2
         const val ORIENTATION_LEFT_RIGHT = 3

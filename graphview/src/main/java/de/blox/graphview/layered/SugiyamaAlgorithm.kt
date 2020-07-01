@@ -9,10 +9,10 @@ import de.blox.graphview.Node
 import de.blox.graphview.edgerenderer.EdgeRenderer
 import de.blox.graphview.util.Size
 import java.util.*
+import kotlin.collections.ArrayList
 import kotlin.math.*
 
-class SugiyamaAlgorithm @JvmOverloads constructor(private val configuration: SugiyamaConfiguration = SugiyamaConfiguration.Builder().build()) :
-        Layout {
+class SugiyamaAlgorithm @JvmOverloads constructor(private val configuration: SugiyamaConfiguration = SugiyamaConfiguration.Builder().build()) : Layout {
     private val nodeData: MutableMap<Node, SugiyamaNodeData> = HashMap()
     private val edgeData: MutableMap<Edge, SugiyamaEdgeData> = HashMap()
     private val stack: MutableSet<Node> = HashSet()
@@ -20,27 +20,39 @@ class SugiyamaAlgorithm @JvmOverloads constructor(private val configuration: Sug
     private var layers: MutableList<ArrayList<Node>> = mutableListOf()
     private lateinit var graph: Graph
     private val edgeRenderer: EdgeRenderer = SugiyamaEdgeRenderer(nodeData, edgeData)
-    override var graphSize = Size(0, 0)
 
     private var nodeCount = 1
 
     private val dummyText: String
         get() = "Dummy " + nodeCount++
 
-    override fun run(graph: Graph) {
+    override fun run(graph: Graph, shiftX: Float, shiftY: Float): Size {
         this.graph = copyGraph(graph)
+
         reset()
+
         initSugiyamaData()
+
         cycleRemoval()
+
         layerAssignment()
+
         nodeOrdering()
+
         coordinateAssignment()
-        calculateGraphSize(this.graph)
+
+        shiftCoordinates(shiftX, shiftY)
+
+        val graphSize = calculateGraphSize(this.graph)
+
         denormalize()
+
         restoreCycle()
+
+        return graphSize
     }
 
-    private fun calculateGraphSize(graph: Graph) {
+    private fun calculateGraphSize(graph: Graph): Size {
         var left = Integer.MAX_VALUE
         var top = Integer.MAX_VALUE
         var right = Integer.MIN_VALUE
@@ -52,7 +64,16 @@ class SugiyamaAlgorithm @JvmOverloads constructor(private val configuration: Sug
             bottom = max(bottom.toFloat(), node.y + node.height).toInt()
         }
 
-        graphSize = Size(right - left, bottom - top)
+        return Size(right - left, bottom - top)
+    }
+
+    private fun shiftCoordinates(shiftX: Float, shiftY: Float) {
+        layers.forEach { arrayList: ArrayList<Node> ->
+            arrayList.forEach {
+                it.x += shiftX
+                it.y += shiftY
+            }
+        }
     }
 
     private fun reset() {
@@ -111,6 +132,19 @@ class SugiyamaAlgorithm @JvmOverloads constructor(private val configuration: Sug
         // build layers
         val copyGraph = copyGraph(graph)
         var roots = getRootNodes(copyGraph)
+
+//        val rootDummy = Node(dummyText)
+//        val dummyNodeData = SugiyamaNodeData()
+//        dummyNodeData.isDummy = true
+//        nodeData[rootDummy] = dummyNodeData
+//
+//        for(node in roots) {
+//            val edge = copyGraph.addEdge(rootDummy, node)
+//            edgeData[edge] = SugiyamaEdgeData()
+//        }
+//
+//        roots = getRootNodes(copyGraph)
+
         while (roots.isNotEmpty()) {
             layers.add(roots)
             copyGraph.removeNodes(*roots.toTypedArray())
@@ -761,9 +795,9 @@ class SugiyamaAlgorithm @JvmOverloads constructor(private val configuration: Sug
         val k = layers.size
 
         // compute height of each layer
-        val data = arrayOfNulls<Float>(graph.nodes.size)
-        Arrays.fill(data, 0f)
-        val height = ArrayList(Arrays.asList<Float>(*data))
+
+        val height = FloatArray(graph.nodes.size)
+        height.fill(0f)
 
         (0 until k).forEach { i ->
             val level = layers[i]

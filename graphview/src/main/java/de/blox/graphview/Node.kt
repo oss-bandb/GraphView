@@ -4,6 +4,7 @@ import de.blox.graphview.util.Size
 import de.blox.graphview.util.VectorF
 
 data class Node(var data: Any) {
+    // TODO make private
     val position: VectorF = VectorF()
     val size: Size = Size()
 

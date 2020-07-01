@@ -23,6 +23,8 @@
     <com.otaliastudios.zoom.ZoomLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_marginTop="?attr/actionBarSize"
+        app:maxZoom="5.5"
         android:scrollbars="vertical|horizontal"
         app:hasClickableChildren="true">
 
@@ -30,10 +32,9 @@
             android:id="@+id/graph"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginTop="?attr/actionBarSize"
             app:lineColor="@android:color/holo_blue_dark"
-            app:lineThickness="2dp"
-            app:useMaxSize="true" />
+            android:padding="50dp"
+            app:lineThickness="2dp" />
     </com.otaliastudios.zoom.ZoomLayout>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton

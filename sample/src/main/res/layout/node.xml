@@ -1,19 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:card_view="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/card_view"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:layout_gravity="center"
-    android:layout_margin="5dp"
-    card_view:cardBackgroundColor="@android:color/holo_blue_dark"
-    card_view:cardElevation="4dp"
-    card_view:contentPadding="10dp">
+    android:layout_margin="10dp"
+    android:background="@android:color/holo_blue_dark"
+    android:padding="10dp">
 
     <TextView
         android:id="@+id/textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="@android:color/white"
-        android:textStyle="bold" />
-</com.google.android.material.card.MaterialCardView>
+        android:textStyle="bold"
+        tools:text="Node text here" />
+</LinearLayout>

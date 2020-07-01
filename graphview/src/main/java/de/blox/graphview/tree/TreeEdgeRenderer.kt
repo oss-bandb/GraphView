@@ -25,7 +25,7 @@ class TreeEdgeRenderer(private val configuration: BuchheimWalkerConfiguration) :
                     ORIENTATION_TOP_BOTTOM -> {
                         // position at the middle-top of the child
                         linePath.moveTo(child.x + child.width / 2f, child.y)
-                        // draws a line from the childs middle-top halfway up to its parent
+                        // draws a line from the child's middle-top halfway up to its parent
                         linePath.lineTo(
                             child.x + child.width / 2f,
                             child.y - configuration.levelSeparation / 2f

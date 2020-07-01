@@ -16,9 +16,9 @@ import kotlin.math.min
 
 
 class GraphView @JvmOverloads constructor(
-    context: Context,
-    attrs: AttributeSet? = null,
-    defStyleAttr: Int = 0
+        context: Context,
+        attrs: AttributeSet? = null,
+        defStyleAttr: Int = 0
 ) : AdapterView<GraphAdapter<GraphView.ViewHolder>>(context, attrs, defStyleAttr) {
     private var linePaint: Paint
 
@@ -72,8 +72,7 @@ class GraphView @JvmOverloads constructor(
     private fun initAttrs(context: Context, attrs: AttributeSet) {
         val a = context.theme.obtainStyledAttributes(attrs, R.styleable.GraphView, 0, 0)
 
-        lineThickness =
-            a.getDimensionPixelSize(R.styleable.GraphView_lineThickness, DEFAULT_LINE_THICKNESS)
+        lineThickness = a.getDimensionPixelSize(R.styleable.GraphView_lineThickness, DEFAULT_LINE_THICKNESS)
         lineColor = a.getColor(R.styleable.GraphView_lineColor, DEFAULT_LINE_COLOR)
         isUsingMaxSize = a.getBoolean(R.styleable.GraphView_useMaxSize, DEFAULT_USE_MAX_SIZE)
 
@@ -93,6 +92,7 @@ class GraphView @JvmOverloads constructor(
             val width = child.measuredWidth
             val height = child.measuredHeight
             val node = adapter!!.getItem(index) as Node
+
             val (x, y) = node.position
 
             // calculate the size and position of this child
@@ -114,8 +114,8 @@ class GraphView @JvmOverloads constructor(
         var params: LayoutParams? = child.layoutParams
         if (params == null) {
             params = LayoutParams(
-                LayoutParams.WRAP_CONTENT,
-                LayoutParams.WRAP_CONTENT
+                    LayoutParams.WRAP_CONTENT,
+                    LayoutParams.WRAP_CONTENT
             )
         }
 
@@ -125,10 +125,10 @@ class GraphView @JvmOverloads constructor(
 
         if (isUsingMaxSize) {
             widthSpec = MeasureSpec.makeMeasureSpec(
-                maxChildWidth, MeasureSpec.EXACTLY
+                    maxChildWidth, MeasureSpec.EXACTLY
             )
             heightSpec = MeasureSpec.makeMeasureSpec(
-                maxChildHeight, MeasureSpec.EXACTLY
+                    maxChildHeight, MeasureSpec.EXACTLY
             )
         }
 
@@ -176,8 +176,8 @@ class GraphView @JvmOverloads constructor(
     }
 
     override fun onLayout(
-        changed: Boolean, left: Int, top: Int, right: Int,
-        bottom: Int
+            changed: Boolean, left: Int, top: Int, right: Int,
+            bottom: Int
     ) {
         super.onLayout(changed, left, top, right, bottom)
 
@@ -218,6 +218,10 @@ class GraphView @JvmOverloads constructor(
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         val adapter = this.adapter ?: return
+        if (!adapter.graph.hasNodes()) {
+            setMeasuredDimension(MeasureSpec.getSize(widthMeasureSpec), MeasureSpec.getSize(heightMeasureSpec))
+            return
+        }
 
         var maxWidth = 0
         var maxHeight = 0
@@ -226,25 +230,18 @@ class GraphView @JvmOverloads constructor(
         for (i in 0 until adapter.count) {
             val child = adapter.getView(i, null, this)
 
-            var params: LayoutParams? = child.layoutParams
+            var params: MarginLayoutParams? = child.layoutParams as? MarginLayoutParams
             if (params == null) {
-                params = LayoutParams(
-                    LayoutParams.WRAP_CONTENT,
-                    LayoutParams.WRAP_CONTENT
-                )
+                params = MarginLayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT)
             }
             addViewInLayout(child, -1, params, true)
-
-            val childWidthSpec = makeMeasureSpec(params.width)
-            val childHeightSpec = makeMeasureSpec(params.height)
-
-            child.measure(childWidthSpec, childHeightSpec)
+            measureChildWithMargins(child, widthMeasureSpec, 0, heightMeasureSpec, 0)
             val node = adapter.getItem(i) as Node
             val measuredWidth = child.measuredWidth
             val measuredHeight = child.measuredHeight
             node.size.apply {
-                width = measuredWidth
-                height = measuredHeight
+                width = child.measuredWidth
+                height = child.measuredHeight
             }
 
             maxWidth = max(maxWidth, measuredWidth)
@@ -263,16 +260,16 @@ class GraphView @JvmOverloads constructor(
                 var params: LayoutParams? = child.layoutParams
                 if (params == null) {
                     params = LayoutParams(
-                        LayoutParams.WRAP_CONTENT,
-                        LayoutParams.WRAP_CONTENT
+                            LayoutParams.WRAP_CONTENT,
+                            LayoutParams.WRAP_CONTENT
                     )
                 }
                 addViewInLayout(child, -1, params, true)
 
                 val widthSpec =
-                    MeasureSpec.makeMeasureSpec(maxChildWidth, MeasureSpec.EXACTLY)
+                        MeasureSpec.makeMeasureSpec(maxChildWidth, MeasureSpec.EXACTLY)
                 val heightSpec =
-                    MeasureSpec.makeMeasureSpec(maxChildHeight, MeasureSpec.EXACTLY)
+                        MeasureSpec.makeMeasureSpec(maxChildHeight, MeasureSpec.EXACTLY)
                 child.measure(widthSpec, heightSpec)
 
                 val node = adapter.getItem(i) as Node
@@ -282,11 +279,11 @@ class GraphView @JvmOverloads constructor(
                 }
             }
         }
+
         adapter.notifyDataSetChanged()
         layout?.run {
-            run(adapter.graph)
-            val size = graphSize
-            setMeasuredDimension(size.width, size.height)
+            val size = run(adapter.graph, paddingLeft.toFloat(), paddingTop.toFloat())
+            setMeasuredDimension(size.width + paddingRight + paddingLeft, size.height + paddingBottom + paddingTop)
         }
     }
 
