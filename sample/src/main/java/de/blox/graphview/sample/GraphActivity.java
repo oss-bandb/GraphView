@@ -1,29 +1,28 @@
 package de.blox.graphview.sample;
 
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import de.blox.graphview.BaseGraphAdapter;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import de.blox.graphview.Graph;
 import de.blox.graphview.GraphAdapter;
 import de.blox.graphview.GraphView;
 import de.blox.graphview.Node;
-import de.blox.graphview.ViewHolder;
 
 public abstract class GraphActivity extends AppCompatActivity {
     private int nodeCount = 1;
     private Node currentNode;
-    protected BaseGraphAdapter<ViewHolder> adapter;
+    protected GraphView graphView;
+    protected GraphAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,23 +36,38 @@ public abstract class GraphActivity extends AppCompatActivity {
     }
 
     private void setupAdapter(Graph graph) {
-        final GraphView graphView = findViewById(R.id.graph);
+        graphView = findViewById(R.id.graph);
+        setLayout(graphView);
+        adapter = new GraphAdapter<GraphView.ViewHolder>(graph) {
 
-        adapter = new BaseGraphAdapter<ViewHolder>(graph) {
+            @Override
+            public int getCount() {
+                return graph.getNodeCount();
+            }
+
+            @Override
+            public Object getItem(int position) {
+                return graph.getNodeAtPosition(position);
+            }
+
+            @Override
+            public boolean isEmpty() {
+                return graph.hasNodes();
+            }
 
             @NonNull
             @Override
-            public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            public GraphView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
                 final View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.node, parent, false);
                 return new SimpleViewHolder(view);
             }
 
             @Override
-            public void onBindViewHolder(ViewHolder viewHolder, Object data, int position) {
-                ((SimpleViewHolder)viewHolder).textView.setText(data.toString());
+            public void onBindViewHolder(GraphView.ViewHolder viewHolder, Object data, int position) {
+                ((SimpleViewHolder) viewHolder).textView.setText(data.toString());
             }
 
-            class SimpleViewHolder extends ViewHolder {
+            class SimpleViewHolder extends GraphView.ViewHolder {
                 TextView textView;
 
                 SimpleViewHolder(View itemView) {
@@ -62,13 +76,10 @@ public abstract class GraphActivity extends AppCompatActivity {
                 }
             }
         };
-
-        setAlgorithm(adapter);
-
         graphView.setAdapter(adapter);
         graphView.setOnItemClickListener((parent, view, position, id) -> {
-            currentNode = adapter.getNode(position);
-            Snackbar.make(graphView, "Clicked on " + currentNode.getData().toString(), Toast.LENGTH_SHORT).show();
+            currentNode = (Node) adapter.getItem(position);
+            Snackbar.make(graphView, "Clicked on " + currentNode.getData().toString(), Snackbar.LENGTH_SHORT).show();
         });
     }
 
@@ -76,12 +87,13 @@ public abstract class GraphActivity extends AppCompatActivity {
         FloatingActionButton addButton = findViewById(R.id.addNode);
         addButton.setOnClickListener(v -> {
             final Node newNode = new Node(getNodeText());
+
             if (currentNode != null) {
                 graph.addEdge(currentNode, newNode);
             } else {
                 graph.addNode(newNode);
-                adapter.notifyInvalidated();
             }
+            adapter.notifyDataSetChanged();
         });
 
         addButton.setOnLongClickListener(v -> {
@@ -110,7 +122,8 @@ public abstract class GraphActivity extends AppCompatActivity {
     }
 
     public abstract Graph createGraph();
-    public abstract void setAlgorithm(GraphAdapter adapter);
+
+    public abstract void setLayout(GraphView view);
     protected String getNodeText() {
         return "Node " + nodeCount++;
     }

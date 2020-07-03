@@ -1,7 +1,7 @@
 package de.blox.graphview.sample.Algorithms;
 
 import de.blox.graphview.Graph;
-import de.blox.graphview.GraphAdapter;
+import de.blox.graphview.GraphView;
 import de.blox.graphview.Node;
 import de.blox.graphview.layered.SugiyamaAlgorithm;
 import de.blox.graphview.sample.GraphActivity;
@@ -11,6 +11,7 @@ public class SugiyamaActivity extends GraphActivity {
     @Override
     public Graph createGraph() {
         final Graph graph = new Graph();
+
         final Node node1 = new Node(getNodeText());
         final Node node2 = new Node(getNodeText());
         final Node node3 = new Node(getNodeText());
@@ -69,11 +70,12 @@ public class SugiyamaActivity extends GraphActivity {
         graph.addEdge(node19, node22);
         graph.addEdge(node21, node23);
         graph.addEdge(node22, node23);
+
         return graph;
     }
 
     @Override
-    public void setAlgorithm(GraphAdapter adapter) {
-        adapter.setAlgorithm(new SugiyamaAlgorithm());
+    public void setLayout(GraphView view) {
+        view.setLayout(new SugiyamaAlgorithm());
     }
 }

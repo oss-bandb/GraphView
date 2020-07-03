@@ -1,7 +1,7 @@
 package de.blox.graphview.sample.Algorithms;
 
 import de.blox.graphview.Graph;
-import de.blox.graphview.GraphAdapter;
+import de.blox.graphview.GraphView;
 import de.blox.graphview.Node;
 import de.blox.graphview.energy.FruchtermanReingoldAlgorithm;
 import de.blox.graphview.sample.GraphActivity;
@@ -33,7 +33,7 @@ public class FruchtermanReingoldActivity extends GraphActivity {
     }
 
     @Override
-    public void setAlgorithm(GraphAdapter adapter) {
-        adapter.setAlgorithm(new FruchtermanReingoldAlgorithm(1000));
+    public void setLayout(GraphView view) {
+        view.setLayout(new FruchtermanReingoldAlgorithm(1000));
     }
 }

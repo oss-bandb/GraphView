@@ -1,15 +1,16 @@
 apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
 
 android {
-    compileSdkVersion 27
+    compileSdkVersion 29
 
     defaultConfig {
         minSdkVersion 16
-        targetSdkVersion 27
+        targetSdkVersion 29
         versionCode 1
         versionName "1.0"
 
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
     }
     buildTypes {
@@ -27,9 +28,9 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'com.android.support:appcompat-v7:27.1.1'
-    implementation 'com.annimon:stream:1.2.1'
-    api 'com.otaliastudios:zoomlayout:1.7.0'
+    implementation "androidx.appcompat:appcompat:1.1.0"
+    implementation "androidx.annotation:annotation:1.1.0"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
 }
 
 ext {
@@ -45,7 +46,7 @@ ext {
     siteUrl = "https://github.com/Team-Blox/GraphView"
     gitUrl = "https://github.com/Team-Blox/GraphView.git"
 
-    libraryVersion = '0.6.1'
+    libraryVersion = '0.7.0'
 
     developerId = 'Team-Blox'
     developerName = 'Blox'
