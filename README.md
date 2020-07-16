@@ -81,7 +81,7 @@ public class GraphActivity extends AppCompatActivity {
         graph.addEdge(node1, node3);
 
         // you can set the graph via the constructor or use the adapter.setGraph(Graph) method
-        adapter = new GraphAdapter<GraphView.ViewHolder>(graph) {
+        GraphAdapter adapter = new GraphAdapter<GraphView.ViewHolder>(graph) {
 
             @NonNull
             @Override
@@ -104,7 +104,7 @@ public class GraphActivity extends AppCompatActivity {
                 .setSubtreeSeparation(300)
                 .setOrientation(BuchheimWalkerConfiguration.ORIENTATION_TOP_BOTTOM)
                 .build();
-        adapter.setLayout(new BuchheimWalkerAlgorithm(configuration));
+        graphView.setLayout(new BuchheimWalkerAlgorithm(configuration));
     }
 }
 ```
