@@ -6,23 +6,32 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
+
 import de.blox.graphview.Graph;
 import de.blox.graphview.GraphAdapter;
+import de.blox.graphview.GraphAdapter2;
 import de.blox.graphview.GraphView;
 import de.blox.graphview.Node;
 
 public abstract class GraphActivity extends AppCompatActivity {
+
     private int nodeCount = 1;
+
     private Node currentNode;
+
     protected GraphView graphView;
+
     protected GraphAdapter adapter;
+
+    private GraphAdapter2<SimpleViewHolder>
+            mAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,6 +45,24 @@ public abstract class GraphActivity extends AppCompatActivity {
     }
 
     private void setupAdapter(Graph graph) {
+//        final RecyclerView recyclerView = findViewById(R.id.recylcerView);
+//        recyclerView.setLayoutManager(new TreeLinearLayoutManager());
+//        mAdapter = new GraphAdapter2<SimpleViewHolder>(graph) {
+//            @Override
+//            public void onBindViewHolder(@NotNull SimpleViewHolder holder, @NotNull Object data) {
+//                holder.textView.setText(data.toString());
+//            }
+//
+//            @NonNull
+//            @Override
+//            public SimpleViewHolder onCreateViewHolder(@NonNull ViewGroup parent,
+//                    int viewType) {
+//                final View view = LayoutInflater.from(parent.getContext())
+//                        .inflate(R.layout.node, parent, false);
+//                return new SimpleViewHolder(view);
+//            }
+//        };
+//        recyclerView.setAdapter(mAdapter);
         graphView = findViewById(R.id.graph);
         setLayout(graphView);
         adapter = new GraphAdapter<GraphView.ViewHolder>(graph) {
@@ -58,7 +85,8 @@ public abstract class GraphActivity extends AppCompatActivity {
             @NonNull
             @Override
             public GraphView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-                final View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.node, parent, false);
+                final View view = LayoutInflater
+                        .from(parent.getContext()).inflate(R.layout.node, parent, false);
                 return new SimpleViewHolder(view);
             }
 
@@ -81,6 +109,22 @@ public abstract class GraphActivity extends AppCompatActivity {
             currentNode = (Node) adapter.getItem(position);
             Snackbar.make(graphView, "Clicked on " + currentNode.getData().toString(), Snackbar.LENGTH_SHORT).show();
         });
+    }
+
+    class SimpleViewHolder extends GraphAdapter2.ViewHolder {
+
+        TextView textView;
+
+        SimpleViewHolder(View itemView) {
+            super(itemView);
+            textView = itemView.findViewById(R.id.textView);
+
+            itemView.setOnClickListener(v -> {
+                currentNode = (Node) adapter.getItem(getAdapterPosition());
+                Snackbar.make(itemView, "Clicked on " + currentNode.getData().toString(),
+                        Snackbar.LENGTH_SHORT).show();
+            });
+        }
     }
 
     private void setupFab(final Graph graph) {
@@ -124,6 +168,7 @@ public abstract class GraphActivity extends AppCompatActivity {
     public abstract Graph createGraph();
 
     public abstract void setLayout(GraphView view);
+
     protected String getNodeText() {
         return "Node " + nodeCount++;
     }

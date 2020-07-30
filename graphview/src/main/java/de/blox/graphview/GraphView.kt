@@ -27,8 +27,8 @@ class GraphView @JvmOverloads constructor(
             strokeWidth = lineThickness.toFloat()
             color = lineColor
             style = Paint.Style.STROKE
-            strokeJoin = Paint.Join.ROUND    // set the join to round you want
-            pathEffect = CornerPathEffect(10f)   // set the path effect when they join.
+            strokeJoin = Paint.Join.ROUND
+            pathEffect = CornerPathEffect(10f)
         }
 
         attrs?.let { initAttrs(context, it) }
