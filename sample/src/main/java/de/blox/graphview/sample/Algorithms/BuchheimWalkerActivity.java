@@ -5,15 +5,14 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 
 import de.blox.graphview.Graph;
-import de.blox.graphview.GraphView;
 import de.blox.graphview.Node;
 import de.blox.graphview.sample.GraphActivity;
 import de.blox.graphview.sample.R;
-import de.blox.graphview.tree.BuchheimWalkerAlgorithm;
 import de.blox.graphview.tree.BuchheimWalkerConfiguration;
+import de.blox.graphview.tree.BuchheimWalkerLayoutManager;
+import de.blox.graphview.tree.TreeEdgeDecoration;
 
 public class BuchheimWalkerActivity extends GraphActivity {
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
@@ -44,13 +43,15 @@ public class BuchheimWalkerActivity extends GraphActivity {
             default:
                 return super.onOptionsItemSelected(item);
         }
-        graphView.setLayout(new BuchheimWalkerAlgorithm(builder.build()));
+        graphView.setLayoutManager(new BuchheimWalkerLayoutManager(this, builder.build()));
         return true;
     }
 
     @Override
     public Graph createGraph() {
         final Graph graph = new Graph();
+        graph.setAsTree(true);  // currently necessary to delete nodes from the tree
+
         final Node node1 = new Node(getNodeText());
         final Node node2 = new Node(getNodeText());
         final Node node3 = new Node(getNodeText());
@@ -67,31 +68,31 @@ public class BuchheimWalkerActivity extends GraphActivity {
         graph.addEdge(node1, node2);
         graph.addEdge(node1, node3);
         graph.addEdge(node1, node4);
-//        graph.addEdge(node1, new Node(getNodeText()));
-//        graph.addEdge(node1, new Node(getNodeText()));
-//        graph.addEdge(node1, new Node(getNodeText()));
-//        graph.addEdge(node1, new Node(getNodeText()));
         graph.addEdge(node2, node5);
-        graph.addEdge(node3, node5);
-//        graph.addEdge(node4, node5);
-//        graph.addEdge(node6, node7);
-//        graph.addEdge(node6, node8);
-//        graph.addEdge(node4, node9);
-//        graph.addEdge(node4, node10);
-//        graph.addEdge(node4, node11);
-//        graph.addEdge(node11, node12);
+        graph.addEdge(node2, node6);
+        graph.addEdge(node6, node7);
+        graph.addEdge(node6, node8);
+        graph.addEdge(node4, node9);
+        graph.addEdge(node4, node10);
+        graph.addEdge(node4, node11);
+        graph.addEdge(node11, node12);
 
         return graph;
     }
 
     @Override
-    public void setLayout(GraphView view) {
+    public void setLayoutManager() {
         final BuchheimWalkerConfiguration configuration = new BuchheimWalkerConfiguration.Builder()
                 .setSiblingSeparation(100)
-                .setLevelSeparation(300)
-                .setSubtreeSeparation(300)
+                .setLevelSeparation(100)
+                .setSubtreeSeparation(100)
                 .setOrientation(BuchheimWalkerConfiguration.ORIENTATION_TOP_BOTTOM)
                 .build();
-        view.setLayout(new BuchheimWalkerAlgorithm(configuration));
+        graphView.setLayoutManager(new BuchheimWalkerLayoutManager(this, configuration));
+    }
+
+    @Override
+    public void setEdgeDecoration() {
+        graphView.addItemDecoration(new TreeEdgeDecoration());
     }
 }

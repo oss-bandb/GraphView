@@ -1,19 +1,35 @@
 package de.blox.graphview.edgerenderer
 
-import android.graphics.Canvas
-import android.graphics.Paint
-import android.graphics.Path
-import de.blox.graphview.Graph
+import android.graphics.*
+import androidx.recyclerview.widget.RecyclerView
+import de.blox.graphview.AbstractGraphAdapter
 import de.blox.graphview.Node
 
-open class ArrowEdgeRenderer : EdgeRenderer {
+open class ArrowDecoration constructor(private val linePaint: Paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+    strokeWidth = 5f
+    color = Color.BLACK
+    style = Paint.Style.STROKE
+    strokeJoin = Paint.Join.ROUND
+    pathEffect = CornerPathEffect(10f)
+}) : RecyclerView.ItemDecoration() {
+
     private val trianglePath = Path()
 
-    override fun render(canvas: Canvas, graph: Graph, paint: Paint) {
-        val trianglePaint = Paint(paint)
-        trianglePaint.style = Paint.Style.FILL
+    override fun onDraw(c: Canvas, parent: RecyclerView, state: RecyclerView.State) {
+        if (parent.layoutManager == null) {
+            return
+        }
+        val adapter = parent.adapter
+        if (adapter !is AbstractGraphAdapter) {
+            throw RuntimeException(
+                    "GraphLayoutManager only works with ${AbstractGraphAdapter::class.simpleName}")
+        }
 
-        graph.edges.forEach { (source, destination) ->
+        val graph = adapter.graph
+        val trianglePaint = Paint(this.linePaint).apply {
+            style = Paint.Style.FILL
+        }
+        graph?.edges?.forEach { (source, destination) ->
             val (x1, y1) = source.position
             val (x2, y2) = destination.position
 
@@ -24,21 +40,16 @@ open class ArrowEdgeRenderer : EdgeRenderer {
 
             val clippedLine = clipLine(startX, startY, stopX, stopY, destination)
 
-            val triangleCentroid: FloatArray = drawTriangle(canvas, trianglePaint, clippedLine[0], clippedLine[1], clippedLine[2], clippedLine[3])
-
-            canvas.drawLine(clippedLine[0],
-                    clippedLine[1],
-                    triangleCentroid[0],
-                    triangleCentroid[1], paint)
+            drawTriangle(c, trianglePaint, clippedLine[0], clippedLine[1], clippedLine[2], clippedLine[3])
         }
     }
 
     protected fun clipLine(
-        startX: Float,
-        startY: Float,
-        stopX: Float,
-        stopY: Float,
-        destination: Node
+            startX: Float,
+            startY: Float,
+            stopX: Float,
+            stopY: Float,
+            destination: Node
     ): FloatArray {
         val resultLine = FloatArray(4)
         resultLine[0] = startX
@@ -110,6 +121,7 @@ open class ArrowEdgeRenderer : EdgeRenderer {
     }
 
     companion object {
+        //TODO: expose
         private const val ARROW_DEGREES = 0.5f
         private const val ARROW_LENGTH = 50f
     }

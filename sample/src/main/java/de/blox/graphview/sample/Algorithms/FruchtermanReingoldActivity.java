@@ -1,9 +1,9 @@
 package de.blox.graphview.sample.Algorithms;
 
 import de.blox.graphview.Graph;
-import de.blox.graphview.GraphView;
 import de.blox.graphview.Node;
-import de.blox.graphview.energy.FruchtermanReingoldAlgorithm;
+import de.blox.graphview.edgerenderer.ArrowEdgeDecoration;
+import de.blox.graphview.energy.FruchtermanReingoldLayoutManager;
 import de.blox.graphview.sample.GraphActivity;
 
 public class FruchtermanReingoldActivity extends GraphActivity {
@@ -33,7 +33,12 @@ public class FruchtermanReingoldActivity extends GraphActivity {
     }
 
     @Override
-    public void setLayout(GraphView view) {
-        view.setLayout(new FruchtermanReingoldAlgorithm(1000));
+    public void setLayoutManager() {
+        graphView.setLayoutManager(new FruchtermanReingoldLayoutManager(this, 1000));
+    }
+
+    @Override
+    public void setEdgeDecoration() {
+        graphView.addItemDecoration(new ArrowEdgeDecoration());
     }
 }

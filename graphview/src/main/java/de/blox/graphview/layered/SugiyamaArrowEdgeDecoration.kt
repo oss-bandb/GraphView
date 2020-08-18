@@ -1,25 +1,42 @@
 package de.blox.graphview.layered
 
-import android.graphics.Canvas
-import android.graphics.Paint
-import android.graphics.Path
-import de.blox.graphview.Edge
-import de.blox.graphview.Graph
-import de.blox.graphview.Node
-import de.blox.graphview.edgerenderer.ArrowEdgeRenderer
+import android.graphics.*
+import androidx.recyclerview.widget.RecyclerView
+import de.blox.graphview.AbstractGraphAdapter
+import de.blox.graphview.edgerenderer.ArrowDecoration
 
+//TODO throw UnsupportedOperationException("SugiyamaAlgorithm currently not support custom edge renderer!")
+class SugiyamaArrowEdgeDecoration @JvmOverloads constructor(private val linePaint: Paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+    strokeWidth = 5f
+    color = Color.BLACK
+    style = Paint.Style.STROKE
+    strokeJoin = Paint.Join.ROUND
+    pathEffect = CornerPathEffect(10f)
+}) : ArrowDecoration(linePaint) {
 
-class SugiyamaEdgeRenderer internal constructor(
-        private val nodeData: Map<Node, SugiyamaNodeData>,
-        private val edgeData: Map<Edge, SugiyamaEdgeData>
-) : ArrowEdgeRenderer() {
+    override fun onDraw(c: Canvas, parent: RecyclerView, state: RecyclerView.State) {
+        if (parent.layoutManager == null) {
+            return
+        }
+        val adapter = parent.adapter
+        if (adapter !is AbstractGraphAdapter) {
+            throw RuntimeException(
+                    "SugiyamaArrowEdgeDecoration only works with ${AbstractGraphAdapter::class.simpleName}")
+        }
+        val layout = parent.layoutManager
+        if (layout !is SugiyamaLayoutManager) {
+            throw RuntimeException(
+                    "SugiyamaArrowEdgeDecoration only works with ${SugiyamaLayoutManager::class.simpleName}")
+        }
 
-    override fun render(canvas: Canvas, graph: Graph, paint: Paint) {
-        val trianglePaint = Paint(paint)
-        trianglePaint.style = Paint.Style.FILL
+        val graph = adapter.graph
+        val edgeData = layout.edgeData
+        val nodeData = layout.nodeData
         val path = Path()
+        val trianglePaint = Paint(linePaint)
+        trianglePaint.style = Paint.Style.FILL
 
-        graph.edges.forEach { edge ->
+        graph?.edges?.forEach { edge ->
             val source = edge.source
             val (x, y) = source.position
             val destination = edge.destination
@@ -48,7 +65,7 @@ class SugiyamaEdgeRenderer internal constructor(
                             destination
                     )
                 }
-                val triangleCentroid = drawTriangle(canvas, trianglePaint, clippedLine[0], clippedLine[1], clippedLine[2], clippedLine[3])
+                val triangleCentroid = drawTriangle(c, trianglePaint, clippedLine[0], clippedLine[1], clippedLine[2], clippedLine[3])
 
                 path.reset()
                 path.moveTo(bendPoints[0], bendPoints[1])
@@ -56,7 +73,7 @@ class SugiyamaEdgeRenderer internal constructor(
                     path.lineTo(bendPoints[i - 1], bendPoints[i])
                 }
                 path.lineTo(triangleCentroid[0], triangleCentroid[1])
-                canvas.drawPath(path, paint)
+                c.drawPath(path, linePaint)
             } else {
                 val startX = x + source.width / 2f
                 val startY = y + source.height / 2f
@@ -65,12 +82,12 @@ class SugiyamaEdgeRenderer internal constructor(
 
                 clippedLine = clipLine(startX, startY, stopX, stopY, destination)
 
-                val triangleCentroid = drawTriangle(canvas, trianglePaint, clippedLine[0], clippedLine[1], clippedLine[2], clippedLine[3])
+                val triangleCentroid = drawTriangle(c, trianglePaint, clippedLine[0], clippedLine[1], clippedLine[2], clippedLine[3])
 
-                canvas.drawLine(clippedLine[0],
+                c.drawLine(clippedLine[0],
                         clippedLine[1],
                         triangleCentroid[0],
-                        triangleCentroid[1], paint)
+                        triangleCentroid[1], linePaint)
             }
         }
     }

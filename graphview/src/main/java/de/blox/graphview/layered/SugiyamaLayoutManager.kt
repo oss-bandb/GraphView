@@ -1,25 +1,22 @@
 package de.blox.graphview.layered
 
-import android.graphics.Canvas
-import android.graphics.Paint
+import android.content.Context
 import de.blox.graphview.Edge
 import de.blox.graphview.Graph
-import de.blox.graphview.Layout
+import de.blox.graphview.GraphLayoutManager
 import de.blox.graphview.Node
-import de.blox.graphview.edgerenderer.EdgeRenderer
 import de.blox.graphview.util.Size
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.math.*
 
-class SugiyamaAlgorithm @JvmOverloads constructor(private val configuration: SugiyamaConfiguration = SugiyamaConfiguration.Builder().build()) : Layout {
-    private val nodeData: MutableMap<Node, SugiyamaNodeData> = HashMap()
-    private val edgeData: MutableMap<Edge, SugiyamaEdgeData> = HashMap()
+class SugiyamaLayoutManager @JvmOverloads constructor(private val context: Context, val configuration: SugiyamaConfiguration = SugiyamaConfiguration.Builder().build()) : GraphLayoutManager(context) {
+    internal val nodeData: MutableMap<Node, SugiyamaNodeData> = HashMap()
+    internal val edgeData: MutableMap<Edge, SugiyamaEdgeData> = HashMap()
     private val stack: MutableSet<Node> = HashSet()
     private val visited: MutableSet<Node> = HashSet()
     private var layers: MutableList<ArrayList<Node>> = mutableListOf()
     private lateinit var graph: Graph
-    private val edgeRenderer: EdgeRenderer = SugiyamaEdgeRenderer(nodeData, edgeData)
 
     private var nodeCount = 1
 
@@ -248,11 +245,11 @@ class SugiyamaAlgorithm @JvmOverloads constructor(private val configuration: Sug
                         }
                     }
                 }
-                currentLayer.sortWith(Comparator { n1, n2 ->
+                currentLayer.sortWith { n1, n2 ->
                     val nodeData1 = nodeData.getValue(n1)
                     val nodeData2 = nodeData.getValue(n2)
                     nodeData1.median - nodeData2.median
-                })
+                }
             }
         } else {
             for (l in 1 until layers.size) {
@@ -272,11 +269,11 @@ class SugiyamaAlgorithm @JvmOverloads constructor(private val configuration: Sug
                         }
                     }
                 }
-                currentLayer.sortWith(Comparator { n1, n2 ->
+                currentLayer.sortWith { n1, n2 ->
                     val nodeData1 = nodeData.getValue(n1)
                     val nodeData2 = nodeData.getValue(n2)
                     nodeData1.median - nodeData2.median
-                })
+                }
             }
         }
     }
@@ -471,7 +468,7 @@ class SugiyamaAlgorithm @JvmOverloads constructor(private val configuration: Sug
         // get the minimum coordinate value
         var minValue = (0..3)
                 .flatMap { x[it].values }
-                .min()
+                .minOrNull()
                 ?: java.lang.Float.MAX_VALUE
 
         // set left border to 0
@@ -495,7 +492,7 @@ class SugiyamaAlgorithm @JvmOverloads constructor(private val configuration: Sug
         }
 
         // get the minimum coordinate value
-        minValue = coordinates.values.min()
+        minValue = coordinates.values.minOrNull()
                 ?: Integer.MAX_VALUE.toFloat()
 
         // set left border to 0
@@ -889,13 +886,5 @@ class SugiyamaAlgorithm @JvmOverloads constructor(private val configuration: Sug
                 }
             }
         }
-    }
-
-    override fun drawEdges(canvas: Canvas, graph: Graph, linePaint: Paint) {
-        edgeRenderer.render(canvas, this.graph, linePaint)
-    }
-
-    override fun setEdgeRenderer(renderer: EdgeRenderer) {
-        throw UnsupportedOperationException("SugiyamaAlgorithm currently not support custom edge renderer!")
     }
 }

@@ -1,14 +1,11 @@
 package de.blox.graphview.energy
 
-import android.graphics.Canvas
-import android.graphics.Paint
+import android.content.Context
 import android.graphics.RectF
 import de.blox.graphview.Edge
 import de.blox.graphview.Graph
-import de.blox.graphview.Layout
+import de.blox.graphview.GraphLayoutManager
 import de.blox.graphview.Node
-import de.blox.graphview.edgerenderer.ArrowEdgeRenderer
-import de.blox.graphview.edgerenderer.EdgeRenderer
 import de.blox.graphview.util.Size
 import de.blox.graphview.util.VectorF
 import java.util.*
@@ -16,13 +13,11 @@ import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.sqrt
 
-class FruchtermanReingoldAlgorithm @JvmOverloads constructor(private val iterations: Int = DEFAULT_ITERATIONS) :
-        Layout {
-    private var edgeRenderer: EdgeRenderer = ArrowEdgeRenderer()
+class FruchtermanReingoldLayoutManager @JvmOverloads constructor(private val context: Context, private val iterations: Int = DEFAULT_ITERATIONS) : GraphLayoutManager(context) {
     private val disps: MutableMap<Node, VectorF> = HashMap()
     private val rand = Random(SEED)
-    private var width: Int = 0
-    private var height: Int = 0
+    private var w: Int = 0  // width
+    private var h: Int = 0  // height
     private var k: Float = 0.toFloat()
     private var t: Float = 0.toFloat()
     private var attraction_k: Float = 0.toFloat()
@@ -32,10 +27,7 @@ class FruchtermanReingoldAlgorithm @JvmOverloads constructor(private val iterati
         nodes.forEach { node ->
             // create meta data for each node
             disps[node] = VectorF()
-            node.setPosition(
-                    randInt(rand, 0, width / 2).toFloat(),
-                    randInt(rand, 0, height / 2).toFloat()
-            )
+            node.setPosition(randInt(rand, 0, w / 2).toFloat(), randInt(rand, 0, h / 2).toFloat())
         }
     }
 
@@ -46,16 +38,7 @@ class FruchtermanReingoldAlgorithm @JvmOverloads constructor(private val iterati
     private fun limitMaximumDisplacement(nodes: List<Node>) {
         nodes.forEach {
             val dispLength = max(EPSILON, getDisp(it).length().toDouble()).toFloat()
-            it.setPosition(
-                    it.position.add(
-                            getDisp(it).divide(dispLength).multiply(
-                                    min(
-                                            dispLength,
-                                            t
-                                    )
-                            )
-                    )
-            )
+            it.setPosition(it.position.add(getDisp(it).divide(dispLength).multiply(min(dispLength, t))))
         }
     }
 
@@ -63,14 +46,8 @@ class FruchtermanReingoldAlgorithm @JvmOverloads constructor(private val iterati
         edges.forEach { (v, u) ->
             val delta = v.position.subtract(u.position)
             val deltaLength = max(EPSILON, delta.length().toDouble()).toFloat()
-            setDisp(
-                    v,
-                    getDisp(v).subtract(delta.divide(deltaLength).multiply(forceAttraction(deltaLength)))
-            )
-            setDisp(
-                    u,
-                    getDisp(u).add(delta.divide(deltaLength).multiply(forceAttraction(deltaLength)))
-            )
+            setDisp(v, getDisp(v).subtract(delta.divide(deltaLength).multiply(forceAttraction(deltaLength))))
+            setDisp(u, getDisp(u).add(delta.divide(deltaLength).multiply(forceAttraction(deltaLength))))
         }
     }
 
@@ -80,10 +57,7 @@ class FruchtermanReingoldAlgorithm @JvmOverloads constructor(private val iterati
                 if (u != v) {
                     val delta = v.position.subtract(u.position)
                     val deltaLength = max(EPSILON, delta.length().toDouble()).toFloat()
-                    setDisp(
-                            v,
-                            getDisp(v).add(delta.divide(deltaLength).multiply(forceRepulsion(deltaLength)))
-                    )
+                    setDisp(v, getDisp(v).add(delta.divide(deltaLength).multiply(forceRepulsion(deltaLength))))
                 }
             }
         }
@@ -107,14 +81,14 @@ class FruchtermanReingoldAlgorithm @JvmOverloads constructor(private val iterati
 
     override fun run(graph: Graph, shiftX: Float, shiftY: Float): Size {
         val size = findBiggestSize(graph) * graph.nodeCount
-        width = size
-        height = size
+        w = size
+        h = size
 
         val nodes = graph.nodes
         val edges = graph.edges
 
-        t = (0.1 * sqrt((width / 2f * height / 2f).toDouble())).toFloat()
-        k = (0.75 * sqrt((width * height / nodes.size.toFloat()).toDouble())).toFloat()
+        t = (0.1 * sqrt((w / 2f * h / 2f).toDouble())).toFloat()
+        k = (0.75 * sqrt((w * h / nodes.size.toFloat()).toDouble())).toFloat()
 
         attraction_k = 0.75f * k
         repulsion_k = 0.75f * k
@@ -244,7 +218,7 @@ class FruchtermanReingoldAlgorithm @JvmOverloads constructor(private val iterati
     private fun findBiggestSize(graph: Graph): Int {
         return graph.nodes
                 .map { max(it.height, it.width) }
-                .max()
+                .maxOrNull()
                 ?: 0
     }
 
@@ -259,15 +233,7 @@ class FruchtermanReingoldAlgorithm @JvmOverloads constructor(private val iterati
     }
 
     private fun done(): Boolean {
-        return t < 1.0 / max(height, width)
-    }
-
-    override fun drawEdges(canvas: Canvas, graph: Graph, linePaint: Paint) {
-        edgeRenderer.render(canvas, graph, linePaint)
-    }
-
-    override fun setEdgeRenderer(renderer: EdgeRenderer) {
-        this.edgeRenderer = renderer
+        return t < 1.0 / max(h, w)
     }
 
     private fun calculateGraphSize(graph: Graph): Size {
@@ -335,6 +301,7 @@ class FruchtermanReingoldAlgorithm @JvmOverloads constructor(private val iterati
     }
 
     companion object {
+        //TODO: builder?
         const val DEFAULT_ITERATIONS = 1000
         const val CLUSTER_PADDING = 100
         private const val EPSILON = 0.0001

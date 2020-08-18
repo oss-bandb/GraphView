@@ -1,21 +1,17 @@
 package de.blox.graphview.tree
 
-import android.graphics.Canvas
-import android.graphics.Paint
+import android.content.Context
 import de.blox.graphview.Graph
-import de.blox.graphview.Layout
+import de.blox.graphview.GraphLayoutManager
 import de.blox.graphview.Node
-import de.blox.graphview.edgerenderer.EdgeRenderer
 import de.blox.graphview.util.Size
 import de.blox.graphview.util.VectorF
 import java.util.*
 import kotlin.math.max
 import kotlin.math.min
 
-class BuchheimWalkerAlgorithm @JvmOverloads constructor(private val configuration: BuchheimWalkerConfiguration = BuchheimWalkerConfiguration.Builder().build()) :
-        Layout {
+class BuchheimWalkerLayoutManager @JvmOverloads constructor(private val context: Context, val configuration: BuchheimWalkerConfiguration = BuchheimWalkerConfiguration.Builder().build()) : GraphLayoutManager(context) {
     private val mNodeData: MutableMap<Node, BuchheimWalkerNodeData> = HashMap()
-    private var edgeRenderer: EdgeRenderer = TreeEdgeRenderer(configuration)
     private var minNodeHeight = Integer.MAX_VALUE
     private var minNodeWidth = Integer.MAX_VALUE
     private var maxNodeWidth = Integer.MIN_VALUE
@@ -490,13 +486,5 @@ class BuchheimWalkerAlgorithm @JvmOverloads constructor(private val configuratio
         }
 
         return nodeList
-    }
-
-    override fun drawEdges(canvas: Canvas, graph: Graph, linePaint: Paint) {
-        edgeRenderer.render(canvas, graph, linePaint)
-    }
-
-    override fun setEdgeRenderer(renderer: EdgeRenderer) {
-        this.edgeRenderer = renderer
     }
 }

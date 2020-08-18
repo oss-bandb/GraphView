@@ -1,9 +1,10 @@
 package de.blox.graphview.sample.Algorithms;
 
 import de.blox.graphview.Graph;
-import de.blox.graphview.GraphView;
 import de.blox.graphview.Node;
-import de.blox.graphview.layered.SugiyamaAlgorithm;
+import de.blox.graphview.layered.SugiyamaArrowEdgeDecoration;
+import de.blox.graphview.layered.SugiyamaConfiguration;
+import de.blox.graphview.layered.SugiyamaLayoutManager;
 import de.blox.graphview.sample.GraphActivity;
 
 public class SugiyamaActivity extends GraphActivity {
@@ -75,7 +76,13 @@ public class SugiyamaActivity extends GraphActivity {
     }
 
     @Override
-    public void setLayout(GraphView view) {
-        view.setLayout(new SugiyamaAlgorithm());
+    public void setLayoutManager() {
+
+        graphView.setLayoutManager(new SugiyamaLayoutManager(this, new SugiyamaConfiguration.Builder().build()));
+    }
+
+    @Override
+    public void setEdgeDecoration() {
+        graphView.addItemDecoration(new SugiyamaArrowEdgeDecoration());
     }
 }
