@@ -27,23 +27,22 @@ public abstract class GraphActivity extends AppCompatActivity {
     private Node currentNode;
 
     protected RecyclerView graphView;
-    protected AbstractGraphAdapter<SimpleViewHolder> adapter;
+    protected AbstractGraphAdapter<NodeViewHolder> adapter;
     private FloatingActionButton fab;
 
     private void setupGraphView(Graph graph) {
-
-        adapter = new AbstractGraphAdapter<SimpleViewHolder>() {
+        adapter = new AbstractGraphAdapter<NodeViewHolder>() {
             @NonNull
             @Override
-            public SimpleViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+            public NodeViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
                 final View view = LayoutInflater.from(parent.getContext())
                         .inflate(R.layout.node, parent, false);
-                return new SimpleViewHolder(view);
+                return new NodeViewHolder(view);
             }
 
             @Override
-            public void onBindViewHolder(@NonNull SimpleViewHolder holder, int position) {
-                holder.textView.setText(graph.getNodeAtPosition(position).getData().toString());
+            public void onBindViewHolder(@NonNull NodeViewHolder holder, int position) {
+                holder.textView.setText(Objects.requireNonNull(getNodeData(position)).toString());
             }
         };
 
@@ -112,11 +111,11 @@ public abstract class GraphActivity extends AppCompatActivity {
 
     }
 
-    protected class SimpleViewHolder extends RecyclerView.ViewHolder {
+    protected class NodeViewHolder extends RecyclerView.ViewHolder {
 
         TextView textView;
 
-        SimpleViewHolder(View itemView) {
+        NodeViewHolder(View itemView) {
             super(itemView);
             textView = itemView.findViewById(R.id.textView);
 

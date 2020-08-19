@@ -50,7 +50,6 @@ public class BuchheimWalkerActivity extends GraphActivity {
     @Override
     public Graph createGraph() {
         final Graph graph = new Graph();
-        graph.setAsTree(true);  // currently necessary to delete nodes from the tree
 
         final Node node1 = new Node(getNodeText());
         final Node node2 = new Node(getNodeText());

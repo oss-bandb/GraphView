@@ -324,6 +324,7 @@ class BuchheimWalkerLayoutManager @JvmOverloads constructor(private val context:
     override fun run(graph: Graph, shiftX: Float, shiftY: Float): Size {
         // TODO check for cycles and multiple parents
         mNodeData.clear()
+        graph.setAsTree(true)
 
         val firstNode = graph.getNodeAtPosition(0)
         firstWalk(graph, firstNode, 0, 0)

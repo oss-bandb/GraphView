@@ -120,7 +120,7 @@ class Graph {
     fun getInEdges(node: Node): List<Edge> = _edges.filter { it.destination == node }
 
     // Todo this is a quick fix and should be removed later
-    fun setAsTree(isTree: Boolean) {
+    internal fun setAsTree(isTree: Boolean) {
         this.isTree = isTree
     }
 
