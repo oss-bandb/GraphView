@@ -17,7 +17,7 @@ Download
 
 ```groovy
 dependencies {
-    implementation 'de.blox:graphview:0.7.0'
+    implementation 'de.blox:graphview:0.7.1'
 }
 ```
 Layouts

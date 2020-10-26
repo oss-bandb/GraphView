@@ -46,7 +46,7 @@ ext {
     siteUrl = "https://github.com/Team-Blox/GraphView"
     gitUrl = "https://github.com/Team-Blox/GraphView.git"
 
-    libraryVersion = '0.7.0'
+    libraryVersion = '0.7.1'
 
     developerId = 'Team-Blox'
     developerName = 'Blox'
