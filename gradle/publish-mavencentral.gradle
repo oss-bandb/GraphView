@@ -1,0 +1,52 @@
+apply plugin: 'maven-publish'
+
+configure(subprojects) {
+    apply<MavenPublishPlugin>()
+
+    configure<JavaPluginExtension> {
+        withJavadocJar()
+        withSourcesJar()
+    }
+
+    configure<PublishingExtension> {
+        publications {
+            val main by creating(MavenPublication::class) {
+                from(components["java"])
+
+                pom {
+                    name.set("…")
+                    description.set("…")
+                    url.set("…")
+                    licenses {
+                        license {
+                            name.set("…")
+                            url.set("…")
+                        }
+                    }
+                    developers {
+                        developer {
+                            id.set("…")
+                            name.set("…")
+                            email.set("…")
+                        }
+                    }
+                    scm {
+                        connection.set("…")
+                        developerConnection.set("…")
+                        url.set("…")
+                    }
+                }
+            }
+        }
+        repositories {
+            maven {
+                name = "OSSRH"
+                setUrl("https://oss.sonatype.org/service/local/staging/deploy/maven2")
+                credentials {
+                    username = System.getenv("OSSRH_USER")
+                    password = System.getenv("OSSRH_PASSWORD")
+                }
+            }
+        }
+    }
+}

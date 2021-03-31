@@ -3,7 +3,7 @@ GraphView
 
 Android GraphView is used to display data in graph structures.
 
-![alt Logo](image/GraphView_logo.png "Graph Logo")
+![alt Logo](image/GraphView_logo.jpg "Graph Logo")
 
 Overview
 ========
@@ -11,13 +11,22 @@ The library can be used within `RecyclerView` and currently works with small gra
 
 **This project is currently experimental and the API subject to breaking changes without notice.**
 
-
 Download
 ========
+The library is only available on MavenCentral. Please add this code to your build.gradle file on project level:
+```gradle
+allprojects {
+  repositories {
+    ...
+    mavenCentral()
+  }
+}
+```
 
-```groovy
+And add the dependency to the build.gradle file within the app module:
+```gradle
 dependencies {
-    implementation 'de.blox:graphview:0.8.0'
+    implementation 'dev.bandb.graphview:0.8.0'
 }
 ```
 Layouts
@@ -53,51 +62,50 @@ Currently GraphView must be used together with a Zoom Engine like [ZoomLayout](h
 
 To create a graph, we need to instantiate the `Graph` class. Next submit your graph to your Adapter, for that you must extend from the `AbstractGraphAdapter` class.
 
-```java
-private void setupGraphView() {
-    RecyclerView graphView = findViewById(R.id.graphView);
+```kotlin
+private void setupGraphView {
+    val graphView = findViewById(R.id.graphView)
 
     // 1. Set a layout manager of the ones described above that the RecyclerView will use.
-    final BuchheimWalkerConfiguration configuration = new BuchheimWalkerConfiguration.Builder()
-            .setSiblingSeparation(100)
-            .setLevelSeparation(100)
-            .setSubtreeSeparation(100)
-            .setOrientation(BuchheimWalkerConfiguration.ORIENTATION_TOP_BOTTOM)
-            .build();
-    graphView.setLayoutManager(new BuchheimWalkerLayoutManager(context, configuration));
+    val configuration = BuchheimWalkerConfiguration.Builder()
+                    .setSiblingSeparation(100)
+                    .setLevelSeparation(100)
+                    .setSubtreeSeparation(100)
+                    .setOrientation(BuchheimWalkerConfiguration.ORIENTATION_TOP_BOTTOM)
+                    .build()
+    graphView.layoutManager = BuchheimWalkerLayoutManager(context, configuration)
 
     // 2. Attach item decorations to draw edges
-    graphView.addItemDecoration(new TreeEdgeDecoration());
+    graphView.addItemDecoration(TreeEdgeDecoration())
 
     // 3. Build your graph
-    final Graph graph = new Graph();
-    final Node node1 = new Node("Parent");
-    final Node node2 = new Node("Child 1");
-    final Node node3 = new Node("Child 2");
+    val graph = Graph()
+    val node1 = Node("Parent")
+    val node2 = Node("Child 1")
+    val node3 = Node("Child 2")
 
-    graph.addEdge(node1, node2);
-    graph.addEdge(node1, node3);
+    graph.addEdge(node1, node2)
+    graph.addEdge(node1, node3)
 
     // 4. You will need a simple Adapter/ViewHolder.
     // 4.1 Your Adapter class should extend from `AbstractGraphAdapter`
-    // 4.2 ViewHolder should extend from `RecyclerView.ViewHolder`
-    adapter = new AbstractGraphAdapter<NodeViewHolder>() {
-        @NonNull
-        @Override
-        public NodeViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            final View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.node, parent, false);
-            return new NodeViewHolder(view);
+    adapter = object : AbstractGraphAdapter<NodeViewHolder>() {
+
+        // 4.2 ViewHolder should extend from `RecyclerView.ViewHolder`
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NodeViewHolder {
+            val view = LayoutInflater.from(parent.context)
+                    .inflate(R.layout.node, parent, false)
+            return NodeViewHolder(view)
         }
 
-        @Override
-        public void onBindViewHolder(@NonNull NodeViewHolder holder, int position) {
-            holder.textView.setText(getNodeData(position).toString());
+        override fun onBindViewHolder(holder: NodeViewHolder, position: Int) {
+            holder.textView.text = getNodeData(position).toString()
         }
-    };
-    graphView.setAdapter(adapter);
-
-    // 4.3 Submit the graph
-    adapter.submitGraph(graph);
+    }.apply {
+        // 4.3 Submit the graph
+        this.submitGraph(graph)
+        graphView.adapter = this
+    }
 }
 ```
 
@@ -115,7 +123,7 @@ Examples
 License
 =======
 
-    Copyright 2019 - 2020 Team-Blox
+    Copyright 2019 - 2021 Block & Block
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
