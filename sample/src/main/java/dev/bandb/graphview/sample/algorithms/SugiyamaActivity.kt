@@ -10,11 +10,11 @@ import dev.bandb.graphview.sample.GraphActivity
 class SugiyamaActivity : GraphActivity() {
 
     public override fun setLayoutManager() {
-        graphView.layoutManager = SugiyamaLayoutManager(this, SugiyamaConfiguration.Builder().build())
+        recyclerView.layoutManager = SugiyamaLayoutManager(this, SugiyamaConfiguration.Builder().build())
     }
 
     public override fun setEdgeDecoration() {
-        graphView.addItemDecoration(SugiyamaArrowEdgeDecoration())
+        recyclerView.addItemDecoration(SugiyamaArrowEdgeDecoration())
     }
 
     public override fun createGraph(): Graph {

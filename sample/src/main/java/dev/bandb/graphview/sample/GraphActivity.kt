@@ -16,7 +16,7 @@ import dev.bandb.graphview.Node
 import java.util.*
 
 abstract class GraphActivity : AppCompatActivity() {
-    protected lateinit var graphView: RecyclerView
+    protected lateinit var recyclerView: RecyclerView
     protected lateinit var adapter: AbstractGraphAdapter<NodeViewHolder>
     private lateinit var fab: FloatingActionButton
     private var currentNode: Node? = null
@@ -31,7 +31,7 @@ abstract class GraphActivity : AppCompatActivity() {
         setContentView(R.layout.activity_graph)
 
         val graph = createGraph()
-        graphView = findViewById(R.id.graphView)
+        recyclerView = findViewById(R.id.recycler)
         setLayoutManager()
         setEdgeDecoration()
         setupGraphView(graph)
@@ -53,7 +53,7 @@ abstract class GraphActivity : AppCompatActivity() {
             }
         }.apply {
             this.submitGraph(graph)
-            graphView.adapter = this
+            recyclerView.adapter = this
         }
     }
 

@@ -9,11 +9,11 @@ import dev.bandb.graphview.sample.GraphActivity
 class FruchtermanReingoldActivity : GraphActivity() {
 
     public override fun setLayoutManager() {
-        graphView.layoutManager = FruchtermanReingoldLayoutManager(this, 1000)
+        recyclerView.layoutManager = FruchtermanReingoldLayoutManager(this, 1000)
     }
 
     public override fun setEdgeDecoration() {
-        graphView.addItemDecoration(ArrowEdgeDecoration())
+        recyclerView.addItemDecoration(ArrowEdgeDecoration())
     }
 
     public override fun createGraph(): Graph {

@@ -19,11 +19,11 @@ class BuchheimWalkerActivity : GraphActivity() {
                 .setSubtreeSeparation(100)
                 .setOrientation(BuchheimWalkerConfiguration.ORIENTATION_TOP_BOTTOM)
                 .build()
-        graphView.layoutManager = BuchheimWalkerLayoutManager(this, configuration)
+        recyclerView.layoutManager = BuchheimWalkerLayoutManager(this, configuration)
     }
 
     public override fun setEdgeDecoration() {
-        graphView.addItemDecoration(TreeEdgeDecoration())
+        recyclerView.addItemDecoration(TreeEdgeDecoration())
     }
 
     public override fun createGraph(): Graph {
@@ -77,8 +77,8 @@ class BuchheimWalkerActivity : GraphActivity() {
         } else {
             return super.onOptionsItemSelected(item)
         }
-        graphView.layoutManager = BuchheimWalkerLayoutManager(this, builder.build())
-        graphView.adapter = adapter
+        recyclerView.layoutManager = BuchheimWalkerLayoutManager(this, builder.build())
+        recyclerView.adapter = adapter
         return true
     }
 }

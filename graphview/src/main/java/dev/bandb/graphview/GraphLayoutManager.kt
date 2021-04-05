@@ -7,10 +7,18 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import dev.bandb.graphview.util.Size
 import kotlin.math.max
-import kotlin.math.min
 
-abstract class GraphLayoutManager internal constructor(private val context: Context) : RecyclerView.LayoutManager() {
+abstract class GraphLayoutManager internal constructor(context: Context)
+    : RecyclerView.LayoutManager() {
+
+    var useMaxSize: Boolean = DEFAULT_USE_MAX_SIZE
+        set(value) {
+            field = value
+            requestLayout()
+        }
+
     private var adapter: AbstractGraphAdapter<*>? = null
+
     override fun generateDefaultLayoutParams(): RecyclerView.LayoutParams =
             RecyclerView.LayoutParams(
                     RecyclerView.LayoutParams.WRAP_CONTENT,
@@ -44,101 +52,87 @@ abstract class GraphLayoutManager internal constructor(private val context: Cont
 
     override fun onMeasure(recycler: RecyclerView.Recycler, state: RecyclerView.State,
                            widthSpec: Int, heightSpec: Int) {
+        val adapter = adapter
         if (adapter == null) {
             Log.e("GraphLayoutManager", "No adapter attached; skipping layout")
             super.onMeasure(recycler, state, widthSpec, heightSpec)
             return
         }
 
-        adapter?.let {
-            val graph = adapter?.graph
-            if (graph == null || !graph.hasNodes()) {
-                super.onMeasure(recycler, state, widthSpec, heightSpec)
-                return
+        val graph = adapter.graph
+        if (graph == null || !graph.hasNodes()) {
+            Log.e("GraphLayoutManager", "No graph set; skipping layout")
+            super.onMeasure(recycler, state, widthSpec, heightSpec)
+            return
+        }
+
+        var maxWidth = 0
+        var maxHeight = 0
+
+        for (i in 0 until state.itemCount) {
+            val child = recycler.getViewForPosition(i)
+
+            var params: ViewGroup.MarginLayoutParams? = child.layoutParams as? ViewGroup.MarginLayoutParams
+            if (params == null) {
+                params = ViewGroup.MarginLayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
             }
 
-            var maxWidth = 0
-            var maxHeight = 0
-            var minHeight = Integer.MAX_VALUE
+            addView(child)
 
+            val childWidthSpec = makeMeasureSpec(params.width)
+            val childHeightSpec = makeMeasureSpec(params.height)
+            child.measure(childWidthSpec, childHeightSpec)
+
+            val measuredWidth = child.measuredWidth
+            val measuredHeight = child.measuredHeight
+
+            val node = adapter.getNode(i)
+            node?.size?.apply {
+                width = measuredWidth
+                height = measuredHeight
+            }
+
+            maxWidth = max(maxWidth, measuredWidth)
+            maxHeight = max(maxHeight, measuredHeight)
+        }
+
+        if (useMaxSize) {
+            detachAndScrapAttachedViews(recycler)
             for (i in 0 until state.itemCount) {
                 val child = recycler.getViewForPosition(i)
 
-                //var params: ViewGroup.LayoutParams? = child.layoutParams
-                var params: ViewGroup.MarginLayoutParams? = child.layoutParams as? ViewGroup.MarginLayoutParams
-                if (params == null) {
-                    params = ViewGroup.MarginLayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
-                }
-
                 addView(child)
 
-                val childWidthSpec = makeMeasureSpec(params.width)
-                val childHeightSpec = makeMeasureSpec(params.height)
-
+                val childWidthSpec = makeMeasureSpec(maxWidth)
+                val childHeightSpec = makeMeasureSpec(maxHeight)
                 child.measure(childWidthSpec, childHeightSpec)
-                val node = it.getNode(i)
-                val measuredWidth = child.measuredWidth
-                val measuredHeight = child.measuredHeight
+
+                val node = adapter.getNode(i)
                 node?.size?.apply {
-                    width = measuredWidth
-                    height = measuredHeight
+                    width = child.measuredWidth
+                    height = child.measuredHeight
                 }
-
-                maxWidth = max(maxWidth, measuredWidth)
-                maxHeight = max(maxHeight, measuredHeight)
-                minHeight = min(minHeight, measuredHeight)
             }
-
-            it.notifyDataSetChanged()
-
-            val size = run(graph, paddingLeft.toFloat(), paddingTop.toFloat())
-            setMeasuredDimension(size.width + paddingRight + paddingLeft, size.height + paddingBottom + paddingTop)
         }
 
-//        maxChildWidth = maxWidth
-//        maxChildHeight = maxHeight
-
-//        if (isUsingMaxSize) {
-//            removeAllViewsInLayout()
-//            for (i in 0 until adapter.count) {
-//                val child = adapter.getView(i, null, this)
-//
-//                var params: ViewGroup.LayoutParams? = child.layoutParams
-//                if (params == null) {
-//                    params = ViewGroup.LayoutParams(
-//                            RecyclerView.LayoutParams.WRAP_CONTENT,
-//                            RecyclerView.LayoutParams.WRAP_CONTENT
-//                    )
-//                }
-//                addViewInLayout(child, -1, params, true)
-//
-//                val widthSpec =
-//                        View.MeasureSpec.makeMeasureSpec(maxChildWidth, View.MeasureSpec.EXACTLY)
-//                val heightSpec =
-//                        View.MeasureSpec.makeMeasureSpec(maxChildHeight, View.MeasureSpec.EXACTLY)
-//                child.measure(widthSpec, heightSpec)
-//
-//                val node = adapter.getNode(i) as Node
-//                node.size.apply {
-//                    width = child.measuredWidth
-//                    height = child.measuredHeight
-//                }
-//            }
-//        }
-
+        val size = run(graph, paddingLeft.toFloat(), paddingTop.toFloat())
+        setMeasuredDimension(size.width + paddingRight + paddingLeft, size.height + paddingBottom + paddingTop)
     }
 
     private fun positionItems(recycler: RecyclerView.Recycler,
                               itemCount: Int) {
         for (index in 0 until itemCount) {
             val child = recycler.getViewForPosition(index)
-            addView(child)
-            measureChildWithMargins(child, 0, 0)
 
             adapter?.getNode(index)?.let {
-                val width = child.measuredWidth
-                val height = child.measuredHeight
+                val width = it.width
+                val height = it.height
                 val (x, y) = it.position
+
+                addView(child)
+                val childWidthSpec = makeMeasureSpec(it.width)
+                val childHeightSpec = makeMeasureSpec(it.height)
+                child.measure(childWidthSpec, childHeightSpec)
 
                 // calculate the size and position of this child
                 val left = x.toInt()
