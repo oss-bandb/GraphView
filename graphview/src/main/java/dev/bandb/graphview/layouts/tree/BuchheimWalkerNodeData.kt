@@ -1,6 +1,6 @@
-package dev.bandb.graphview.tree
+package dev.bandb.graphview.layouts.tree
 
-import dev.bandb.graphview.Node
+import dev.bandb.graphview.graph.Node
 
 internal class BuchheimWalkerNodeData {
     lateinit var ancestor: Node

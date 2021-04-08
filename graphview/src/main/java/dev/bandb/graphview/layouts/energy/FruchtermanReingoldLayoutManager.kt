@@ -1,11 +1,11 @@
-package dev.bandb.graphview.energy
+package dev.bandb.graphview.layouts.energy
 
 import android.content.Context
 import android.graphics.RectF
-import dev.bandb.graphview.Edge
-import dev.bandb.graphview.Graph
-import dev.bandb.graphview.GraphLayoutManager
-import dev.bandb.graphview.Node
+import dev.bandb.graphview.graph.Edge
+import dev.bandb.graphview.graph.Graph
+import dev.bandb.graphview.graph.Node
+import dev.bandb.graphview.layouts.GraphLayoutManager
 import dev.bandb.graphview.util.Size
 import dev.bandb.graphview.util.VectorF
 import java.util.*

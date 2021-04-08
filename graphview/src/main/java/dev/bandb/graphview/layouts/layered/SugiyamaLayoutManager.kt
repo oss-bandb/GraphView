@@ -1,10 +1,10 @@
-package dev.bandb.graphview.layered
+package dev.bandb.graphview.layouts.layered
 
 import android.content.Context
-import dev.bandb.graphview.Edge
-import dev.bandb.graphview.Graph
-import dev.bandb.graphview.GraphLayoutManager
-import dev.bandb.graphview.Node
+import dev.bandb.graphview.graph.Edge
+import dev.bandb.graphview.graph.Graph
+import dev.bandb.graphview.graph.Node
+import dev.bandb.graphview.layouts.GraphLayoutManager
 import dev.bandb.graphview.util.Size
 import java.util.*
 import kotlin.collections.ArrayList

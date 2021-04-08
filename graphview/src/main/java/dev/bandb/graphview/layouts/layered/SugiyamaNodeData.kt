@@ -1,6 +1,6 @@
-package dev.bandb.graphview.layered
+package dev.bandb.graphview.layouts.layered
 
-import dev.bandb.graphview.Node
+import dev.bandb.graphview.graph.Node
 
 internal class SugiyamaNodeData {
     val reversed = mutableSetOf<Node>()

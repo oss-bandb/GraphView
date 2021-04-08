@@ -51,7 +51,7 @@ For this you’ll need to add a `RecyclerView` to your layout and create an item
     app:hasClickableChildren="true">
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/graphView"
+        android:id="@+id/recycler"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 
@@ -64,7 +64,7 @@ To create a graph, we need to instantiate the `Graph` class. Next submit your gr
 
 ```kotlin
 private void setupGraphView {
-    val graphView = findViewById(R.id.graphView)
+    val recycler = findViewById(R.id.recycler)
 
     // 1. Set a layout manager of the ones described above that the RecyclerView will use.
     val configuration = BuchheimWalkerConfiguration.Builder()
@@ -73,10 +73,10 @@ private void setupGraphView {
                     .setSubtreeSeparation(100)
                     .setOrientation(BuchheimWalkerConfiguration.ORIENTATION_TOP_BOTTOM)
                     .build()
-    graphView.layoutManager = BuchheimWalkerLayoutManager(context, configuration)
+    recycler.layoutManager = BuchheimWalkerLayoutManager(context, configuration)
 
     // 2. Attach item decorations to draw edges
-    graphView.addItemDecoration(TreeEdgeDecoration())
+    recycler.addItemDecoration(TreeEdgeDecoration())
 
     // 3. Build your graph
     val graph = Graph()
@@ -104,9 +104,31 @@ private void setupGraphView {
     }.apply {
         // 4.3 Submit the graph
         this.submitGraph(graph)
-        graphView.adapter = this
+        recycler.adapter = this
     }
 }
+```
+
+Customization
+======
+You can change the edge design by supplying your custom paint object to your edge decorator.
+```kotlin
+    val edgeStyle = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        strokeWidth = 5f
+        color = Color.BLACK
+        style = Paint.Style.STROKE
+        strokeJoin = Paint.Join.ROUND
+        pathEffect = CornerPathEffect(10f) 
+    }
+    
+    recyclerView.addItemDecoration(TreeEdgeDecoration(edgeStyle))
+```
+
+If you want that your nodes are all the same size you can set `useMaxSize` to `true`. The biggest node defines the size for all the other nodes.
+```kotlin
+    recyclerView.layoutManager = BuchheimWalkerLayoutManager(this, configuration).apply { 
+        useMaxSize = true
+    }
 ```
 
 Examples

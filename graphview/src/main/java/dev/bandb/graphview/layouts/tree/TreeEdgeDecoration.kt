@@ -1,4 +1,4 @@
-package dev.bandb.graphview.tree
+package dev.bandb.graphview.layouts.tree
 
 import android.graphics.*
 import androidx.recyclerview.widget.RecyclerView

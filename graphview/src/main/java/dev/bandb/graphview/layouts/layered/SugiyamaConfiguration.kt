@@ -1,4 +1,4 @@
-package dev.bandb.graphview.layered
+package dev.bandb.graphview.layouts.layered
 
 class SugiyamaConfiguration private constructor(builder: Builder) {
     val levelSeparation: Int = builder.levelSeparation

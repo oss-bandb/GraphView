@@ -2,6 +2,8 @@ package dev.bandb.graphview
 
 import androidx.annotation.Nullable
 import androidx.recyclerview.widget.RecyclerView
+import dev.bandb.graphview.graph.Graph
+import dev.bandb.graphview.graph.Node
 
 abstract class AbstractGraphAdapter<VH : RecyclerView.ViewHolder> : RecyclerView.Adapter<VH>() {
     var graph: Graph? = null

@@ -1,9 +1,8 @@
-package dev.bandb.graphview
+package dev.bandb.graphview.graph
 
 class Graph {
     private val _nodes = arrayListOf<Node>()
     private val _edges = arrayListOf<Edge>()
-    private val graphObserver = arrayListOf<GraphObserver>()
     val nodes: List<Node> = _nodes
     val edges: List<Edge> = _edges
 
@@ -15,7 +14,6 @@ class Graph {
     fun addNode(node: Node) {
         if (node !in _nodes) {
             _nodes.add(node)
-            notifyGraphObserver()
         }
     }
 
@@ -41,8 +39,6 @@ class Graph {
                 iterator.remove()
             }
         }
-
-        notifyGraphObserver()
     }
 
     fun removeNodes(vararg nodes: Node) = nodes.forEach { removeNode(it) }
@@ -60,7 +56,6 @@ class Graph {
 
         if (edge !in _edges) {
             _edges.add(edge)
-            notifyGraphObserver()
         }
     }
 
@@ -122,9 +117,5 @@ class Graph {
     // Todo this is a quick fix and should be removed later
     internal fun setAsTree(isTree: Boolean) {
         this.isTree = isTree
-    }
-
-    private fun notifyGraphObserver() = graphObserver.forEach {
-        it.notifyGraphInvalidated()
     }
 }

@@ -1,10 +1,10 @@
 package dev.bandb.graphview.sample.algorithms
 
-import dev.bandb.graphview.Graph
-import dev.bandb.graphview.Node
-import dev.bandb.graphview.layered.SugiyamaArrowEdgeDecoration
-import dev.bandb.graphview.layered.SugiyamaConfiguration
-import dev.bandb.graphview.layered.SugiyamaLayoutManager
+import dev.bandb.graphview.graph.Graph
+import dev.bandb.graphview.graph.Node
+import dev.bandb.graphview.layouts.layered.SugiyamaArrowEdgeDecoration
+import dev.bandb.graphview.layouts.layered.SugiyamaConfiguration
+import dev.bandb.graphview.layouts.layered.SugiyamaLayoutManager
 import dev.bandb.graphview.sample.GraphActivity
 
 class SugiyamaActivity : GraphActivity() {

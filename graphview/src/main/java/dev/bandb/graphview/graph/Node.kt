@@ -1,4 +1,4 @@
-package dev.bandb.graphview
+package dev.bandb.graphview.graph
 
 import dev.bandb.graphview.util.Size
 import dev.bandb.graphview.util.VectorF

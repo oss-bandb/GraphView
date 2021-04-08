@@ -1,4 +1,4 @@
-package dev.bandb.graphview.edgerenderer
+package dev.bandb.graphview.decoration.edge
 
 import android.graphics.Canvas
 import android.graphics.Color

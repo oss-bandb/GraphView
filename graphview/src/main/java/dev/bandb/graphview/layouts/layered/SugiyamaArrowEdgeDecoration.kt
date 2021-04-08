@@ -1,9 +1,9 @@
-package dev.bandb.graphview.layered
+package dev.bandb.graphview.layouts.layered
 
 import android.graphics.*
 import androidx.recyclerview.widget.RecyclerView
 import dev.bandb.graphview.AbstractGraphAdapter
-import dev.bandb.graphview.edgerenderer.ArrowDecoration
+import dev.bandb.graphview.decoration.edge.ArrowDecoration
 
 //TODO throw UnsupportedOperationException("SugiyamaAlgorithm currently not support custom edge renderer!")
 class SugiyamaArrowEdgeDecoration @JvmOverloads constructor(private val linePaint: Paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {

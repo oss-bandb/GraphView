@@ -1,9 +1,9 @@
-package dev.bandb.graphview.edgerenderer
+package dev.bandb.graphview.decoration.edge
 
 import android.graphics.*
 import androidx.recyclerview.widget.RecyclerView
 import dev.bandb.graphview.AbstractGraphAdapter
-import dev.bandb.graphview.Node
+import dev.bandb.graphview.graph.Node
 
 open class ArrowDecoration constructor(private val linePaint: Paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
     strokeWidth = 5f

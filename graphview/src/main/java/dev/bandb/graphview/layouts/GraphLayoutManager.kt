@@ -1,10 +1,12 @@
-package dev.bandb.graphview
+package dev.bandb.graphview.layouts
 
 import android.content.Context
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import dev.bandb.graphview.AbstractGraphAdapter
+import dev.bandb.graphview.graph.Graph
 import dev.bandb.graphview.util.Size
 import kotlin.math.max
 

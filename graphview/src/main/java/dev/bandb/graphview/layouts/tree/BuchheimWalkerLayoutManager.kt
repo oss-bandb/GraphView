@@ -1,9 +1,9 @@
-package dev.bandb.graphview.tree
+package dev.bandb.graphview.layouts.tree
 
 import android.content.Context
-import dev.bandb.graphview.Graph
-import dev.bandb.graphview.GraphLayoutManager
-import dev.bandb.graphview.Node
+import dev.bandb.graphview.graph.Graph
+import dev.bandb.graphview.graph.Node
+import dev.bandb.graphview.layouts.GraphLayoutManager
 import dev.bandb.graphview.util.Size
 import dev.bandb.graphview.util.VectorF
 import java.util.*

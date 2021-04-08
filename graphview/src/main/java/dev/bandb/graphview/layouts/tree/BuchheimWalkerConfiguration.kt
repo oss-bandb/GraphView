@@ -1,4 +1,4 @@
-package dev.bandb.graphview.tree
+package dev.bandb.graphview.layouts.tree
 
 class BuchheimWalkerConfiguration private constructor(builder: Builder) {
     val siblingSeparation: Int

@@ -1,9 +1,9 @@
 package dev.bandb.graphview.sample.algorithms
 
-import dev.bandb.graphview.Graph
-import dev.bandb.graphview.Node
-import dev.bandb.graphview.edgerenderer.ArrowEdgeDecoration
-import dev.bandb.graphview.energy.FruchtermanReingoldLayoutManager
+import dev.bandb.graphview.decoration.edge.ArrowEdgeDecoration
+import dev.bandb.graphview.graph.Graph
+import dev.bandb.graphview.graph.Node
+import dev.bandb.graphview.layouts.energy.FruchtermanReingoldLayoutManager
 import dev.bandb.graphview.sample.GraphActivity
 
 class FruchtermanReingoldActivity : GraphActivity() {

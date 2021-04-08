@@ -11,8 +11,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
 import dev.bandb.graphview.AbstractGraphAdapter
-import dev.bandb.graphview.Graph
-import dev.bandb.graphview.Node
+import dev.bandb.graphview.graph.Graph
+import dev.bandb.graphview.graph.Node
 import java.util.*
 
 abstract class GraphActivity : AppCompatActivity() {
@@ -102,8 +102,8 @@ abstract class GraphActivity : AppCompatActivity() {
                 if (!fab.isShown) {
                     fab.show()
                 }
-                currentNode = adapter.getNode(adapterPosition)
-                Snackbar.make(itemView, "Clicked on " + Objects.requireNonNull(adapter.getNodeData(adapterPosition)).toString(),
+                currentNode = adapter.getNode(bindingAdapterPosition)
+                Snackbar.make(itemView, "Clicked on " + adapter.getNodeData(bindingAdapterPosition)?.toString(),
                         Snackbar.LENGTH_SHORT).show()
             }
         }

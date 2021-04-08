@@ -2,13 +2,13 @@ package dev.bandb.graphview.sample.algorithms
 
 import android.view.Menu
 import android.view.MenuItem
-import dev.bandb.graphview.Graph
-import dev.bandb.graphview.Node
+import dev.bandb.graphview.graph.Graph
+import dev.bandb.graphview.graph.Node
+import dev.bandb.graphview.layouts.tree.BuchheimWalkerConfiguration
+import dev.bandb.graphview.layouts.tree.BuchheimWalkerLayoutManager
+import dev.bandb.graphview.layouts.tree.TreeEdgeDecoration
 import dev.bandb.graphview.sample.GraphActivity
 import dev.bandb.graphview.sample.R
-import dev.bandb.graphview.tree.BuchheimWalkerConfiguration
-import dev.bandb.graphview.tree.BuchheimWalkerLayoutManager
-import dev.bandb.graphview.tree.TreeEdgeDecoration
 
 class BuchheimWalkerActivity : GraphActivity() {
 
