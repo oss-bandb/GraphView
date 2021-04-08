@@ -26,7 +26,7 @@ allprojects {
 And add the dependency to the build.gradle file within the app module:
 ```gradle
 dependencies {
-    implementation 'dev.bandb.graphview:graphview:0.8.0'
+    implementation 'dev.bandb.graphview:graphview:0.8.1'
 }
 ```
 Layouts
