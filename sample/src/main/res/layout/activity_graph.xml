@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="de.blox.graphview.sample.GraphActivity">
+    tools:context=".GraphActivity">
 
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
@@ -20,29 +20,28 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
-    <com.otaliastudios.zoom.ZoomLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginTop="?attr/actionBarSize"
-        app:maxZoom="5.5"
-        android:scrollbars="vertical|horizontal"
-        app:hasClickableChildren="true">
-
-        <de.blox.graphview.GraphView
-            android:id="@+id/graph"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            app:lineColor="@android:color/holo_blue_dark"
-            android:padding="50dp"
-            app:lineThickness="2dp" />
-    </com.otaliastudios.zoom.ZoomLayout>
-
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/addNode"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="@dimen/fab_margin"
+        android:visibility="gone"
+        tools:visibility="visible"
         android:src="@drawable/ic_add_white_24dp" />
+
+    <com.otaliastudios.zoom.ZoomLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scrollbars="vertical|horizontal"
+        app:hasClickableChildren="true">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recycler"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="50dp"
+            android:layout_marginTop="?attr/actionBarSize" />
+    </com.otaliastudios.zoom.ZoomLayout>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

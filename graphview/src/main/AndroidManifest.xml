@@ -1,5 +1,4 @@
-<manifest package="de.blox.graphview">
+<manifest package="dev.bandb.graphview">
 
     <application />
-
 </manifest>
